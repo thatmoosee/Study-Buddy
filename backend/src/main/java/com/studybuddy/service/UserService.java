@@ -3,8 +3,6 @@ package com.studybuddy.service;
 
 import com.studybuddy.model.User;
 import com.studybuddy.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;

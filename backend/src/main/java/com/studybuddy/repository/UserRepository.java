@@ -4,8 +4,6 @@ package com.studybuddy.repository;
 import com.studybuddy.model.User;
 import java.util.*;
 
-import org.springframework.stereotype.Repository;
-
 @Repository
 public class UserRepository {
     private final Map<String, User> users = new HashMap<>();

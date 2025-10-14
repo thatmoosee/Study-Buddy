@@ -13,14 +13,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@RestController
-@RequestMapping("/api/users")
 public class UserControllerImpl implements UserController {
 
-    @Autowired
     private UserService userService;
 
-    @PostMapping("/create")
     public User createUser(@RequestBody UserDTO dto) {
         Profile profile = new Profile(dto.getMajor(), dto.getAvailability());
         User user = new User(UUID.randomUUID().toString(), dto.getName(), dto.getEmail());
@@ -28,13 +24,11 @@ public class UserControllerImpl implements UserController {
         return userService.createUser(user);
     }
 
-    @GetMapping("/{email}")
     public User getUser(@PathVariable String email) {
         return userService.getUserByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("User not found: " + email));
     }
 
-    @GetMapping("/search")
     public List<User> searchUsers(@RequestParam String major) {
         return userService.searchUsersByMajor(major);
     }
