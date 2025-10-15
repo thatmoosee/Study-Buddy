@@ -1,0 +1,76 @@
+body{
+    margin: auto;
+    text-align: center;
+    background-color: antiquewhite;
+}
+header h1{
+    margin: 0;
+    padding: 20px;
+    background-color: white;
+}
+ul{
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: wheat;
+}
+ul li{
+    display: inline-block;
+}
+ul li a{
+    color: black;
+    display: block;
+    background-color: wheat;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+ul li a:hover{
+    background-color:rgb(226, 205, 166);
+}
+main{
+    margin: auto;
+    width: 10vi;
+}   
+main #searchbar{
+    margin: auto;
+    margin-top: 10px;
+    background-color: white;
+    float: left;    
+    display: flex;
+    border: 2px solid black;
+    border-radius: 10em;
+}
+main input{
+    margin: 5px;
+    outline: none;
+    border: none;
+}
+main button{
+    display: inline;
+    margin-right: 5px;
+    border: none;
+    border-radius: 10em;
+    background-color: white;
+}
+main button:hover{
+    background-color: darkgray;
+}
+main button img{
+    width: 15px;
+}
+main .chatbox{
+    margin: 10px;
+}
+main .chat{
+    width: 500px;
+    background-color: white;
+    border: 2px solid black;
+}
+main #box1{
+    height: 40px;
+}
+main #box2{
+    height: 500px;
+}
