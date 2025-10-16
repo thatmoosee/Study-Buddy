@@ -175,7 +175,7 @@ def auth_status():
             'logged_in': True,
             'user': {
                 'user_id': session['user_id'],
-                'email': session['email']
+                'email': session['email'],
                 'profile': user
             }
         })
