@@ -170,11 +170,13 @@ def logout():
 @app.route('/api/auth/status', methods=['GET'])
 def auth_status():
     if 'user_id' in session:
+        user = session.get('profile', {})
         return jsonify({
             'logged_in': True,
             'user': {
                 'user_id': session['user_id'],
                 'email': session['email']
+                'profile': user
             }
         })
     return jsonify({'logged_in': False})
