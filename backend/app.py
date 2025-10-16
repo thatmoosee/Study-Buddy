@@ -128,9 +128,6 @@ HOME_TEMPLATE = '''
 def home():
     return render_template_string(HOME_TEMPLATE)
 
-def upload_profile_info():
-    pass
-
 @app.route('/api/auth/register', methods=['POST'])
 def register():
     data = request.get_json()
@@ -181,6 +178,24 @@ def auth_status():
             }
         })
     return jsonify({'logged_in': False})
+
+@app.route('/api/auth/profile', methods=['POST'])
+def upload_profile_info():
+    if 'user_id' in session:
+        return jsonify({'success': True, 'message': 'Profile info uploaded successfully'})
+    data = request.get_json()
+    if not data:
+        return jsonify({'success': False, 'error': 'Request body is required'}), 400
+    
+    name = data.get('name')
+    major = data.get('major')
+    classes = data.get('classes')
+    availability = data.get('availability')    
+
+    session['user'] = {"name": name, "major": major, "classes": classes, "availability": availability}
+
+    return jsonify({'success': True, 'message': 'Profile info uploaded successfully', 'data': session['user']})
+
 
 if __name__ == '__main__':
     print("Study Buddy running on http://localhost:5000")
