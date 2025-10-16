@@ -128,6 +128,9 @@ HOME_TEMPLATE = '''
 def home():
     return render_template_string(HOME_TEMPLATE)
 
+def upload_profile_info():
+    pass
+
 @app.route('/api/auth/register', methods=['POST'])
 def register():
     data = request.get_json()
