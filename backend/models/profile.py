@@ -4,7 +4,7 @@ class Profile(BaseModel):
     """Profile model - Features 1.1.4, 1.1.5"""
     
     def __init__(self, user_id, name=None, major=None, availability=None,
-                 id=None, created_at=None, preferences=[0,0,0,0,0,0,0]):
+                 id=None, created_at=None, preferences=[0,0,0,0,0,0,0,0,0,0,0,0,0,0]):
         super().__init__(id, created_at)
         self._user_id = user_id
         self._name = name
@@ -36,11 +36,10 @@ class Profile(BaseModel):
     def availability(self):
         return self._availability
     
-    def togglePreferences(self, prefDay):
-        if self.preferences[prefDay] == 1:
-            self.preferences[prefDay] = 0
-        else:
-            self.preferences[prefDay] = 1
+    def changePreferences(self, prefDay, start, end):
+        self.preferences[prefDay] = start
+        self.preferences[prefDay+7] = end
+        
 
     def add_availability(self, time_slot):
         if time_slot not in self._availability:
