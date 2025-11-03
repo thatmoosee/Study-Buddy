@@ -33,6 +33,26 @@ main{
     margin: auto;
     width: 10vi;
 }   
+main #profile{
+    width: 35px;
+    margin: 10px;
+    padding: 5px;
+    border-radius: 10em;
+    position: absolute;
+    right: 0px;
+}
+main #profile:hover{
+    background-color: aliceblue;
+}
+main #preferences{
+    list-style:square;
+    margin: auto;
+    padding: auto;
+    background-color: antiquewhite;
+}
+main #preferences li{
+    display: block;
+}
 main #searchbar{
     margin: auto;
     margin-top: 10px;
