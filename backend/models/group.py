@@ -10,6 +10,14 @@ class Group(BaseModel):
             self._members = [owner_id]
         else:
             self._members = list([owner_id] + members)
+            
+    def add_member(self, user_id):
+        if user_id not in self._members:
+            self._members.append(user_id)
+    
+    def remove_member(self, user_id):
+        if user_id in self._members:
+            self._members.remove(user_id)
     
     def leave_group(self, user_id, profile=None):
         """
