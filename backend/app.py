@@ -1,7 +1,9 @@
 from flask import Flask, request, jsonify, render_template_string, session
 from services.auth_service import AuthService
 from repositories.user_repository import UserRepository
-
+from repositories.group_repository import GroupRepository
+from services.group_service import GroupService
+from models.group import Group
 app = Flask(__name__)
 app.secret_key = "super-secret-key"  # TODO: replace with env var later
 
@@ -9,6 +11,11 @@ app.secret_key = "super-secret-key"  # TODO: replace with env var later
 user_storage = {}
 user_repo = UserRepository(user_storage)
 auth_service = AuthService(user_repo)
+
+
+group_storage = {}
+group_repo = GroupRepository(group_storage)
+group_service = GroupService(group_repo)
 
 # HTML Template with session-aware UI
 HOME_TEMPLATE = '''
@@ -178,6 +185,28 @@ def auth_status():
             }
         })
     return jsonify({'logged_in': False})
+
+
+@app.route('/api/group/leave', methods=['POST'])
+def leave_group():
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'Not logged in'}), 401
+
+    data = request.get_json()
+    if not data or 'group_id' not in data:
+        return jsonify({'success': False, 'error': 'Group ID is required'}), 400
+
+    try:
+        user_id = session['user_id']
+        group_id = data['group_id']
+        updated_group = group_service.leave_group(user_id, group_id)
+        return jsonify({
+            'success': True,
+            'message': f'You have left {updated_group.name}.',
+            'data': updated_group.to_dict()
+        })
+    except ValueError as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
 
 if __name__ == '__main__':
     print("Study Buddy running on http://localhost:5000")
