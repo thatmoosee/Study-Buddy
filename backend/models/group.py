@@ -2,6 +2,15 @@ from base_model import BaseModel
 
 class Group(BaseModel):
     #needs other init and models like the profile and user class
+    def __init__(self, name, owner_id, members=None):
+        self._name = name
+        self._owner_id = owner_id
+        self._members = members
+        if members == None:
+            self._members = [owner_id]
+        else:
+            self._members = list([owner_id] + members)
+    
     def leave_group(self, user_id, profile=None):
         """
         Handles a user leaving a group.
