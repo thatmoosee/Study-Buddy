@@ -201,7 +201,7 @@ def create_group():
         owner_id = session['user_id']
         group = group_service.create_group(name, owner_id, members)
         return jsonify({
-            'success': True, 'message': f'Group "{group._name}" created successfully!',
+            'success': True, 'message': f'Group {group._name} created successfully!',
             'data': {'id': group.id, 'name': group._name, 'members': group._members}
         })
     except ValueError as e:
@@ -220,7 +220,7 @@ def join_group():
         group_id = data['group_id']
         updated_group = group_service.join_group(user_id, group_id)
         return jsonify({
-            'success': True, 'message': f'Group "{updated_group._name}" joined successfully!',
+            'success': True, 'message': f'Group {updated_group._name} joined successfully!',
             'data': {'id': updated_group.id, 'name': updated_group._name, 'members': updated_group._members}
         })
     except ValueError as e:
