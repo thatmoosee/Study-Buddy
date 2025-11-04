@@ -185,8 +185,47 @@ def auth_status():
             }
         })
     return jsonify({'logged_in': False})
+    
+@app.route('/api/group/create', methods=['POST'])
+def create_group():
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'Not logged in'}), 401
+    
+    data = request.get_json()
+    name = data.get('name')
+    members = data.get('members', [])
 
+    if not name:
+        return jsonify({'success': False, 'error': 'Group ID is required'}), 400
+    try:
+        owner_id = session['user_id']
+        group = group_service.create_group(name, owner_id, members)
+        return jsonify({
+            'success': True, 'message': f'Group {group._name} created successfully!',
+            'data': {'id': group.id, 'name': group._name, 'members': group._members}
+        })
+    except ValueError as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
 
+@app.route('/api/group/join', methods=['POST'])
+def join_group():
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'Not logged in'}), 401
+
+    data = request.get_json()
+    if not data or 'group_id' not in data:
+        return jsonify({'success': False, 'error': 'Group ID is required'}), 400
+    try:
+        user_id = session['user_id']
+        group_id = data['group_id']
+        updated_group = group_service.join_group(user_id, group_id)
+        return jsonify({
+            'success': True, 'message': f'Group {updated_group._name} joined successfully!',
+            'data': {'id': updated_group.id, 'name': updated_group._name, 'members': updated_group._members}
+        })
+    except ValueError as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
+    
 @app.route('/api/group/leave', methods=['POST'])
 def leave_group():
     if 'user_id' not in session:
