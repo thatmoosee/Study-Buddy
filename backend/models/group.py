@@ -38,3 +38,17 @@ class Group(BaseModel):
                     profile._groups.remove(self._name)
 
         return True
+
+    def to_dict(self):
+        return {
+            'group_id': self.id,
+            'group_name': self._name,
+            'owner_id': self._owner_id,
+            'members': self._members
+        }
+
+    def validate(self):
+        if not self._name:
+            raise ValueError("Group name is required")
+            
+        }
