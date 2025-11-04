@@ -1,8 +1,10 @@
 from models.base_model import BaseModel
+import uuid
 
 class Group(BaseModel):
     #needs other init and models like the profile and user class
     def __init__(self, name, owner_id, members=None):
+        self.id = uuid.uuid4().hex
         self._name = name
         self._owner_id = owner_id
         self._members = members
