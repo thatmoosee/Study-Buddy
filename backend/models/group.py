@@ -1,4 +1,4 @@
-from base_model import BaseModel
+from models.base_model import BaseModel
 
 class Group(BaseModel):
     #needs other init and models like the profile and user class
