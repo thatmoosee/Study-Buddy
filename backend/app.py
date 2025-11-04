@@ -247,6 +247,18 @@ def leave_group():
     except ValueError as e:
         return jsonify({'success': False, 'error': str(e)}), 400
 
+@app.route("/students/search", methods=["GET"])
+def search_student():
+    email = request.args.get("email", "").strip().lower()
+    if not email:
+        return jsonify({"error": "Email parameter required"}), 400
+
+    user = user_repo.find_by_email(email)
+    if user:
+        return jsonify({"found": True, "student": user}), 200
+    else:
+        return jsonify({"found": False, "message": "Student not found"}), 404
+
 if __name__ == '__main__':
     print("Study Buddy running on http://localhost:5000")
     app.run(debug=True, host='0.0.0.0', port=5000)
