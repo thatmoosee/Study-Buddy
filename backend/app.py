@@ -4,6 +4,7 @@ from repositories.user_repository import UserRepository
 from repositories.group_repository import GroupRepository
 from services.group_service import GroupService
 from models.group import Group
+from repositories.friend_repository import FriendRepository
 app = Flask(__name__)
 app.secret_key = "super-secret-key"  # TODO: replace with env var later
 
@@ -16,6 +17,8 @@ auth_service = AuthService(user_repo)
 group_storage = {}
 group_repo = GroupRepository(group_storage)
 group_service = GroupService(group_repo)
+
+friend_repo = FriendRepository()
 
 # HTML Template with session-aware UI
 HOME_TEMPLATE = '''
