@@ -50,5 +50,3 @@ class Group(BaseModel):
     def validate(self):
         if not self._name:
             raise ValueError("Group name is required")
-            
-        }
