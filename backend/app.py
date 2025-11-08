@@ -1,139 +1,55 @@
-from flask import Flask, request, jsonify, render_template_string, session
+from flask import Flask, request, jsonify, session, send_from_directory
 from services.auth_service import AuthService
 from repositories.user_repository import UserRepository
 from repositories.group_repository import GroupRepository
 from services.group_service import GroupService
 from models.group import Group
-app = Flask(__name__)
-app.secret_key = "super-secret-key"  # TODO: replace with env var later
+import os
 
-# Initialize storage (in-memory for now)
+# Compute correct path to frontend directory (one level up)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+FRONTEND_DIR = os.path.join(BASE_DIR, '..', 'frontend')
+
+# Flask setup
+app = Flask(
+    __name__,
+    static_folder=FRONTEND_DIR,       # Serve files from ../frontend
+    static_url_path=''                # So /index.html works at /
+)
+app.secret_key = "super-secret-key"  # TODO: replace with environment variable later
+
+# Initialize repositories and services
 user_storage = {}
 user_repo = UserRepository(user_storage)
 auth_service = AuthService(user_repo)
-
 
 group_storage = {}
 group_repo = GroupRepository(group_storage)
 group_service = GroupService(group_repo)
 
-# HTML Template with session-aware UI
-HOME_TEMPLATE = '''
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Study Buddy</title>
-</head>
-<body>
-    <h1>Study Buddy</h1>
-
-    <!-- CREATE ACCOUNT -->
-    <div id="registerSection">
-        <h2>Create Account</h2>
-        <form id="registerForm">
-            <input type="email" id="regEmail" placeholder="Email" required><br>
-            <input type="password" id="regPassword" placeholder="Password" required><br>
-            <button type="submit">Create Account</button>
-        </form>
-    </div>
-
-    <!-- SIGN IN -->
-    <div id="loginSection">
-        <h2>Sign In</h2>
-        <form id="loginForm">
-            <input type="email" id="loginEmail" placeholder="Email" required><br>
-            <input type="password" id="loginPassword" placeholder="Password" required><br>
-            <button type="submit">Sign In</button>
-        </form>
-    </div>
-
-    <!-- SIGN OUT -->
-    <div id="logoutSection" style="display:none;">
-        <p id="welcomeMsg"></p>
-        <button id="logoutBtn">Sign Out</button>
-    </div>
-
-    <div id="message"></div>
-
-    <script>
-        async function checkAuthStatus() {
-            const res = await fetch('/api/auth/status');
-            const data = await res.json();
-
-            if (data.logged_in) {
-                document.getElementById('registerSection').style.display = 'none';
-                document.getElementById('loginSection').style.display = 'none';
-                document.getElementById('logoutSection').style.display = 'block';
-                document.getElementById('welcomeMsg').innerText = 'Welcome ' + data.user.email;
-            } else {
-                document.getElementById('registerSection').style.display = 'block';
-                document.getElementById('loginSection').style.display = 'block';
-                document.getElementById('logoutSection').style.display = 'none';
-            }
-        }
-
-        // REGISTER
-        document.getElementById('registerForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('regEmail').value;
-            const password = document.getElementById('regPassword').value;
-
-            const res = await fetch('/api/auth/register', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({email, password})
-            });
-            const data = await res.json();
-            document.getElementById('message').innerText = data.message || data.error;
-
-            if (data.success) {
-                // Auto login after register
-                await fetch('/api/auth/login', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({email, password})
-                });
-                checkAuthStatus();
-            }
-        });
-
-        // LOGIN
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-
-            const res = await fetch('/api/auth/login', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({email, password})
-            });
-            const data = await res.json();
-            if (data.success) {
-                checkAuthStatus();
-            } else {
-                document.getElementById('message').innerText = data.error;
-            }
-        });
-
-        // LOGOUT
-        document.getElementById('logoutBtn').addEventListener('click', async () => {
-            const res = await fetch('/api/auth/logout', {method: 'POST'});
-            const data = await res.json();
-            document.getElementById('message').innerText = data.message;
-            checkAuthStatus();
-        });
-
-        // Run check on page load
-        checkAuthStatus();
-    </script>
-</body>
-</html>
-'''
+# ======================
+# FRONTEND ROUTES
+# ======================
 
 @app.route('/')
-def home():
-    return render_template_string(HOME_TEMPLATE)
+def serve_index():
+    """Serve the main frontend page (index.html)"""
+    return send_from_directory(app.static_folder, 'index.html')
+
+
+@app.route('/<path:path>')
+def serve_frontend(path):
+    """Serve any file from the frontend directory"""
+    full_path = os.path.join(app.static_folder, path)
+    if os.path.exists(full_path):
+        return send_from_directory(app.static_folder, path)
+    else:
+        return send_from_directory(app.static_folder, 'index.html')
+
+
+# ======================
+# AUTHENTICATION ROUTES
+# ======================
 
 @app.route('/api/auth/register', methods=['POST'])
 def register():
@@ -153,6 +69,7 @@ def register():
     except ValueError as e:
         return jsonify({'success': False, 'error': str(e)}), 400
 
+
 @app.route('/api/auth/login', methods=['POST'])
 def login():
     data = request.get_json()
@@ -169,10 +86,12 @@ def login():
     except ValueError as e:
         return jsonify({'success': False, 'error': str(e)}), 401
 
+
 @app.route('/api/auth/logout', methods=['POST'])
 def logout():
     auth_service.logout(session)
     return jsonify({'success': True, 'message': 'Logged out successfully'})
+
 
 @app.route('/api/auth/status', methods=['GET'])
 def auth_status():
@@ -185,7 +104,12 @@ def auth_status():
             }
         })
     return jsonify({'logged_in': False})
-    
+
+
+# ======================
+# GROUP ROUTES
+# ======================
+
 @app.route('/api/group/create', methods=['POST'])
 def create_group():
     if 'user_id' not in session:
@@ -196,16 +120,19 @@ def create_group():
     members = data.get('members', [])
 
     if not name:
-        return jsonify({'success': False, 'error': 'Group ID is required'}), 400
+        return jsonify({'success': False, 'error': 'Group name is required'}), 400
+
     try:
         owner_id = session['user_id']
         group = group_service.create_group(name, owner_id, members)
         return jsonify({
-            'success': True, 'message': f'Group {group._name} created successfully!',
+            'success': True,
+            'message': f'Group {group._name} created successfully!',
             'data': {'id': group.id, 'name': group._name, 'members': group._members}
         })
     except ValueError as e:
         return jsonify({'success': False, 'error': str(e)}), 400
+
 
 @app.route('/api/group/join', methods=['POST'])
 def join_group():
@@ -215,17 +142,20 @@ def join_group():
     data = request.get_json()
     if not data or 'group_id' not in data:
         return jsonify({'success': False, 'error': 'Group ID is required'}), 400
+
     try:
         user_id = session['user_id']
         group_id = data['group_id']
         updated_group = group_service.join_group(user_id, group_id)
         return jsonify({
-            'success': True, 'message': f'Group {updated_group._name} joined successfully!',
+            'success': True,
+            'message': f'Group {updated_group._name} joined successfully!',
             'data': {'id': updated_group.id, 'name': updated_group._name, 'members': updated_group._members}
         })
     except ValueError as e:
         return jsonify({'success': False, 'error': str(e)}), 400
-    
+
+
 @app.route('/api/group/leave', methods=['POST'])
 def leave_group():
     if 'user_id' not in session:
@@ -241,12 +171,17 @@ def leave_group():
         updated_group = group_service.leave_group(user_id, group_id)
         return jsonify({
             'success': True,
-            'message': f'You have left {updated_group.name}.',
+            'message': f'You have left {updated_group._name}.',
             'data': updated_group.to_dict()
         })
     except ValueError as e:
         return jsonify({'success': False, 'error': str(e)}), 400
 
+
+# ======================
+# ENTRY POINT
+# ======================
+
 if __name__ == '__main__':
-    print("Study Buddy running on http://localhost:5000")
+    print("Study Buddy running at http://localhost:5000")
     app.run(debug=True, host='0.0.0.0', port=5000)
