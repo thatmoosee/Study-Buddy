@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>Study Buddy</title>  
+        <link rel="icon" type="image/x-icon" href="img/icon.png">
+        <link rel="stylesheet" href="css/style.css">
+    </head>
+    <body>
+        <div id="header-placeholder"></div>
+        <main>
+            <a href="profile.html"><img id="profile" src="img/profile.png"></a>
+            <h2>Manage Notifications</h2>
+            
+            <section id="notification-settings">
+                <h3>Notification Preferences</h3>
+                <form id="notificationForm">
+                    <div class="notification-option">
+                        <input type="checkbox" id="sessionReminders" name="sessionReminders" checked>
+                        <label for="sessionReminders">Study session reminders</label>
+                    </div>
+                    
+                    <div class="notification-option">
+                        <input type="checkbox" id="newMessages" name="newMessages" checked>
+                        <label for="newMessages">New messages</label>
+                    </div>
+                    
+                    <div class="notification-option">
+                        <input type="checkbox" id="buddyRequests" name="buddyRequests" checked>
+                        <label for="buddyRequests">Study buddy requests</label>
+                    </div>
+                    
+                    <div class="notification-option">
+                        <input type="checkbox" id="updates" name="updates">
+                        <label for="updates">System updates</label>
+                    </div>
+                    
+                    <br>
+                    <label for="reminderTime">Reminder time before session:</label><br>
+                    <select id="reminderTime" name="reminderTime">
+                        <option value="15">15 minutes</option>
+                        <option value="30" selected>30 minutes</option>
+                        <option value="60">1 hour</option>
+                        <option value="120">2 hours</option>
+                    </select>
+                    <br><br>
+                    
+                    <button type="submit">Save Preferences</button>
+                </form>
+            </section>
+            
+            <section id="upcoming-reminders">
+                <h3>Upcoming Reminders</h3>
+                <div id="remindersList">
+                    <div class="reminder-item" data-reminder-id="1">
+                        <p><strong>Study Session - IT 378</strong></p>
+                        <p>Monday, 3:00 PM</p>
+                        <button class="cancel-btn">Cancel Reminder</button>
+                    </div>
+                    <div class="reminder-item" data-reminder-id="2">
+                        <p><strong>Study Session - Math 101</strong></p>
+                        <p>Wednesday, 5:30 PM</p>
+                        <button class="cancel-btn">Cancel Reminder</button>
+                    </div>
+                </div>
+            </section>
+            
+            <div id="message" style="display:none; margin-top: 20px; padding: 10px;"></div>
+        </main>
+        <footer>
+
+        </footer>
+        <script src="js/header.js"></script>
+    </body>
+</html>

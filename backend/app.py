@@ -16,7 +16,7 @@ app = Flask(
     static_folder=FRONTEND_DIR,       # Serve files from ../frontend
     static_url_path=''                # So /index.html works at /
 )
-app.secret_key = "super-secret-key"  # TODO: replace with environment variable later
+app.secret_key = "super-secret-key" 
 
 # Initialize repositories and services
 user_storage = {}
