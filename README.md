@@ -46,15 +46,15 @@ This project uses a hybrid **MVC + N-Tier Architecture**.
 
 ## Architecture Explanation
 
-### Layer 1 — Presentation Layer  
-Consists of HTML pages and frontend assets. Sends requests to controllers and displays returned data.
+### Layer 1: Frontend 
+Consists of header.js, HTML pages and css. Sends requests to controllers and displays returned data.
 
-### Layer 2 — Application Layer  
-Controllers (in `app.py`) handle routes and serve as the "C" in MVC.  
+### Layer 2: Backend
+Controllers (in `app.py`) profile.py and user.py handle routes and serve as the "C" in MVC.  
 Services perform business logic.  
 Validators enforce input structure and rules.
 
-### Layer 3 — Data Layer  
+### Layer 3: Database 
 Models represent database entities.  
 Repositories abstract data operations.
 
