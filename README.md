@@ -44,7 +44,6 @@ This project uses a hybrid **MVC + N-Tier Architecture**.
 
 <img width="1310" height="873" alt="grpex7" src="https://github.com/user-attachments/assets/a3bd4668-504d-497c-bb44-9ceb54d9c1a5" />
 
-
 ## Architecture Explanation
 
 ### Layer 1 — Presentation Layer  
