@@ -40,33 +40,8 @@ The purpose of Study Buddy is to provide a centralized platform for academic col
 
 This project uses a hybrid **MVC + N-Tier Architecture**.
 
-## Architecture Diagram (Text-Based)
-```
-+--------------------------------------------------------------+
-| Layer 1: Presentation Layer (HTML/CSS/JS)                    |
-|--------------------------------------------------------------|
-| index.html, profile.html, chats.html, search.html, etc.      |
-+--------------------------------------------------------------+
+## Architecture Diagram 
 
-                ⇅ interacts with backend controllers
-
-+--------------------------------------------------------------+
-| Layer 2: Application Layer (Controllers + Services)          |
-|--------------------------------------------------------------|
-| Controllers: UserController, ProfileController, GroupController |
-| Services: auth_service, group_service, profile_service        |
-| Validators: base_validator, user_validator                    |
-+--------------------------------------------------------------+
-
-             ⇅ interacts only with repositories
-
-+--------------------------------------------------------------+
-| Layer 3: Data Layer (Models + Repositories)                  |
-|--------------------------------------------------------------|
-| Models: BaseModel, User, Profile, Group, Course              |
-| Repositories: BaseRepository, UserRepository, GroupRepository |
-+--------------------------------------------------------------+
-```
 
 ## Architecture Explanation
 
