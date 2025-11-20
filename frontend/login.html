@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login — Study Buddy</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <main style="text-align:center; margin-top:50px;">
+        <h1>Login</h1>
+
+        <form id="loginForm">
+            <input type="email" id="email" placeholder="Email" required>
+            <br><br>
+            <input type="password" id="password" placeholder="Password" required>
+            <br><br>
+            <button type="submit">Login</button>
+        </form>
+
+        <p>Don't have an account? <a href="register.html">Create one</a></p>
+
+        <p id="error" style="color:red;"></p>
+    </main>
+
+    <script>
+        document.getElementById("loginForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value.trim();
+            const errorBox = document.getElementById("error");
+            errorBox.textContent = "";
+
+            const res = await fetch("/api/auth/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password })
+            });
+
+            const data = await res.json();
+
+            if (data.success) {
+                window.location.href = "profile.html";
+            } else {
+                errorBox.textContent = data.error;
+            }
+        });
+    </script>
+</body>
+</html>

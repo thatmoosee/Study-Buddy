@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <li><a href="filter_free_time.html">Filter by Free Time</a></li>
                 <li><a href="chats.html">Chats</a></li>
                 <li><a href="add_notifications.html">Notifications</a></li>
+                <li><a href="logout.html">Logout</a></li>
             </ul>
         </nav>
     </header>

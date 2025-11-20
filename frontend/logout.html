@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Logging Out...</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="header-placeholder"></div>
+
+    <h2>Logging you out...</h2>
+
+    <script>
+        async function runLogout() {
+            await fetch("/api/auth/logout", { method: "POST" });
+            window.location.href = "login.html";
+        }
+
+        runLogout();
+    </script>
+</body>
+</html>
