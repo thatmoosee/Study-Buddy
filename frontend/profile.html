@@ -1,31 +1,274 @@
 <!DOCTYPE html>
-
 <html>
-    <head>
-        <title>Study Buddy</title>  
-        <link rel="icon" type="image/x-icon" href="img/icon.png">
-        <link rel="stylesheet" href="css/style.css">
-    </head>
-    <body>
-        <div id="header-placeholder"></div>
-        <main>
-            <a href="profile.html"><img id="profile" src="img/profile.png"></a>
-            <h1>Profile</h1>
-            <ul id="preferences">
-                <li>Sun - </li>
-                <li>Mon - </li>
-                <li>Tues - </li>
-                <li>Wed - </li>
-                <li>Thurs - </li>
-                <li>Fri - </li>
-                <li>Sat - </li>
-            </ul>
-            
-        </main>
-        <footer>
+<head>
+    <title>Study Buddy</title>
+    <link rel="icon" type="image/x-icon" href="img/icon.png">
+    <link rel="stylesheet" href="css/style.css">
 
-        </footer>
-        <script src="js/header.js"></script>
+    <style>
+        /* --- PAGE SPACING & LAYOUT --- */
+        main {
+            width: 85%;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 30px;
+            background: #fff7eb;
+            border-radius: 14px;
+            box-shadow: 0px 4px 12px rgba(0,0,0,0.15);
+        }
 
-    </body>
+        h1 {
+            margin-top: 10px;
+            font-size: 2.4rem;
+        }
+
+        h2 {
+            margin-top: 40px;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        section {
+            padding: 20px;
+            margin-top: 10px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
+        }
+
+        input {
+            width: 80%;
+            padding: 10px;
+            margin-top: 8px;
+            border-radius: 6px;
+            border: 1px solid #aaa;
+            font-size: 1.1rem;
+        }
+
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            background: #ffce75;
+            border: none;
+        }
+
+        #groupList {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .group-item {
+            background: #f8e3c4;
+            margin: 10px 0;
+            padding: 12px 15px;
+            font-size: 1.2rem;
+            border-radius: 10px;
+        }
+
+        #profile {
+            width: 130px;
+            border-radius: 50%;
+            margin-bottom: 15px;
+        }
+
+        hr {
+            margin: 40px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="header-placeholder"></div>
+
+    <main style="text-align:center;">
+
+        <a href="profile.html">
+            <img id="profile" src="img/profile.png">
+        </a>
+
+        <h1>Profile</h1>
+
+        <h3 id="userEmail">Loading user...</h3>
+        <button id="logoutBtn">Logout</button>
+
+        <hr>
+
+        <!-- GROUP MANAGEMENT -->
+        <section>
+            <h2>Your Groups</h2>
+            <ul id="groupList"></ul>
+        </section>
+
+        <hr>
+
+        <!-- CREATE GROUP -->
+        <section>
+            <h2>Create Group</h2>
+            <input id="newGroupName" placeholder="Group Name">
+            <br>
+            <button id="createGroupBtn">Create</button>
+            <p id="createGroupError" style="color:red;"></p>
+        </section>
+
+        <hr>
+
+        <!-- JOIN GROUP -->
+        <section>
+            <h2>Join Group</h2>
+            <input id="joinGroupId" placeholder="Group ID">
+            <br>
+            <button id="joinGroupBtn">Join</button>
+            <p id="joinGroupError" style="color:red;"></p>
+        </section>
+
+        <hr>
+
+        <!-- LEAVE GROUP -->
+        <section>
+            <h2>Leave Group</h2>
+            <input id="leaveGroupId" placeholder="Group ID">
+            <br>
+            <button id="leaveGroupBtn">Leave</button>
+            <p id="leaveGroupError" style="color:red;"></p>
+        </section>
+
+        <footer></footer>
+    </main>
+
+    <script>
+        /******************************************
+         * REQUIRE LOGIN — redirect to index.html
+         ******************************************/
+        async function checkAuth() {
+            const res = await fetch("/api/auth/status");
+            const data = await res.json();
+
+            if (!data.logged_in) {
+                window.location.href = "index.html";
+                return;
+            }
+
+            document.getElementById("userEmail").textContent =
+                "Logged in as: " + data.user.email;
+        }
+
+        /******************************************
+         * LOAD USER'S GROUPS
+         ******************************************/
+        async function loadGroups() {
+            const res = await fetch("/api/group/list");
+            if (!res.ok) return;
+
+            const data = await res.json();
+            const list = document.getElementById("groupList");
+            list.innerHTML = "";
+
+            if (data.groups.length === 0) {
+                list.innerHTML = "<p>You are not in any groups.</p>";
+                return;
+            }
+
+            data.groups.forEach(g => {
+                const li = document.createElement("li");
+                li.className = "group-item";
+                li.textContent = `ID: ${g.id} — ${g.name}`;
+                list.appendChild(li);
+            });
+        }
+
+        document.getElementById("logoutBtn").addEventListener("click", async () => {
+            await fetch("/api/auth/logout", { method: "POST" });
+            window.location.href = "index.html";
+        });
+
+        /******************************************
+         * CREATE GROUP
+         ******************************************/
+        document.getElementById("createGroupBtn").addEventListener("click", async () => {
+            const name = document.getElementById("newGroupName").value.trim();
+            const err = document.getElementById("createGroupError");
+
+            err.textContent = "";
+            if (!name) {
+                err.textContent = "Group name required.";
+                return;
+            }
+
+            const res = await fetch("/api/group/create", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name, members: [] })
+            });
+
+            const data = await res.json();
+            if (!data.success) {
+                err.textContent = data.error;
+            } else {
+                loadGroups();
+            }
+        });
+
+        /******************************************
+         * JOIN GROUP
+         ******************************************/
+        document.getElementById("joinGroupBtn").addEventListener("click", async () => {
+            const id = document.getElementById("joinGroupId").value.trim();
+            const err = document.getElementById("joinGroupError");
+            err.textContent = "";
+
+            if (!id) {
+                err.textContent = "Group ID required.";
+                return;
+            }
+
+            const res = await fetch("/api/group/join", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ group_id: id })
+            });
+
+            const data = await res.json();
+            if (!data.success) {
+                err.textContent = data.error;
+            } else {
+                loadGroups();
+            }
+        });
+
+        /******************************************
+         * LEAVE GROUP
+         ******************************************/
+        document.getElementById("leaveGroupBtn").addEventListener("click", async () => {
+            const id = document.getElementById("leaveGroupId").value.trim();
+            const err = document.getElementById("leaveGroupError");
+            err.textContent = "";
+
+            if (!id) {
+                err.textContent = "Group ID required.";
+                return;
+            }
+
+            const res = await fetch("/api/group/leave", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ group_id: id })
+            });
+
+            const data = await res.json();
+            if (!data.success) {
+                err.textContent = data.error;
+            } else {
+                loadGroups();
+            }
+        });
+
+        checkAuth();
+        loadGroups();
+    </script>
+
+    <script src="js/header.js"></script>
+</body>
 </html>

@@ -41,8 +41,8 @@ class Group(BaseModel):
 
     def to_dict(self):
         return {
-            'group_id': self.id,
-            'group_name': self._name,
+            'id': self.id,
+            'name': self._name,
             'owner_id': self._owner_id,
             'members': self._members
         }

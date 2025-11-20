@@ -13,23 +13,28 @@ class GroupService:
         return group
 
     def join_group(self, user_id, group_id):
-        group = self.group_repo(group_id)
-        if user_id in group.members:
-            raise ValueError("User is already in the group")
-        if not group:
-            raise ValueError("Group not found")
-        group.add_member(user_id)
-        return group
-        
-    
-    def leave_group(self, user_id, group_id):
-        group = self.group_repo.get(group_id)
+        group = self.group_repo.get(group_id)   # FIXED
         if not group:
             raise ValueError("Group not found")
 
-        if user_id not in group.members:
-            raise ValueError("User is not a member of this group")
+        if user_id in group._members:
+            raise ValueError("User already in the group")
+
+        group.add_member(user_id)
+        self.group_repo.update(group_id, group)
+        return group
+        
+    def leave_group(self, user_id, group_id):
+        group = self.group_repo.get(group_id)   # FIXED
+        if not group:
+            raise ValueError("Group not found")
+
+        if user_id not in group._members:
+            raise ValueError("User not in this group")
 
         group.remove_member(user_id)
         self.group_repo.update(group_id, group)
         return group
+
+    def list_all_groups(self):
+        return list(self.group_repo.storage.values())  # FIXED

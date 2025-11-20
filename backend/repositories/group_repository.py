@@ -14,3 +14,13 @@ class GroupRepository:
     def update(self, group_id, group):
         if group_id in self.storage:
             self.storage[group_id] = group
+    
+    def list_all(self):
+        return list(self.storage.values())
+    
+    def get_groups_for_user(self, user_id):
+        result = []
+        for group in self.storage.values():
+            if hasattr(group, 'members') and user_id in group.members:
+                result.append(group)
+        return result

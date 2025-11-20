@@ -176,6 +176,29 @@ def leave_group():
         })
     except ValueError as e:
         return jsonify({'success': False, 'error': str(e)}), 400
+    
+@app.route('/api/group/list', methods=['GET'])
+def list_groups():
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'Not logged in'}), 401
+
+    user_id = session['user_id']
+
+    # Get groups user belongs to
+    groups = []
+    for g in group_repo.storage.values():
+        if user_id in g._members:
+            groups.append({
+                'id': g.id,
+                'name': g._name,
+                'members': g._members
+            })
+
+    return jsonify({
+        'success': True,
+        'groups': groups
+    })
+
 
 
 # ======================
