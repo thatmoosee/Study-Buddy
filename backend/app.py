@@ -5,6 +5,7 @@ from repositories.group_repository import GroupRepository
 from services.group_service import GroupService
 from models.group import Group
 from repositories.friend_repository import FriendRepository
+from services.friend_service import FriendService
 app = Flask(__name__)
 app.secret_key = "super-secret-key"  # TODO: replace with env var later
 
@@ -19,6 +20,7 @@ group_repo = GroupRepository(group_storage)
 group_service = GroupService(group_repo)
 
 friend_repo = FriendRepository()
+friend_service = FriendService(friend_repo)
 
 # HTML Template with session-aware UI
 HOME_TEMPLATE = '''
@@ -249,6 +251,19 @@ def leave_group():
         })
     except ValueError as e:
         return jsonify({'success': False, 'error': str(e)}), 400
+
+@app.route('/api/friends/add', methods=['POST'])
+def add_friend():
+    data = request.get_json()
+    requester = data.get("requester")
+    friend = data.get("friend")
+
+    success, message = friend_service.add_friend(requester, friend)
+
+    return jsonify({
+        "success": success,
+        "message": message
+    }), (200 if success else 400)
 
 if __name__ == '__main__':
     print("Study Buddy running on http://localhost:5000")
