@@ -19,9 +19,10 @@ class UserRepository(BaseRepository):
             for u in data.values():
                 user = User(
                     email=u['email'],
-                    password_hash=u.get('_password_hash'),
+                    password_hash=u.get('_password_hash'),  # Pass the hash directly
                     is_active=u.get('_is_active', True),
-                    id=u['id']
+                    id=u['id'],
+                    created_at=None  # Or parse from JSON if you're storing it
                 )
                 self._storage[user.email] = user
                 if user.id >= self._id_counter:

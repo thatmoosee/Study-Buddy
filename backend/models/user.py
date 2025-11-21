@@ -9,24 +9,44 @@ class User(BaseModel):
                  is_active=True, id=None, created_at=None):
         super().__init__(id, created_at)
         self._email = email.lower().strip()
-        self._password_hash = password_hash or self._hash_password(password) if password else None
+        
+        # FIXED: Clear logic for password vs password_hash
+        if password_hash:
+            # Loading from database - use existing hash
+            self._password_hash = password_hash
+        elif password:
+            # New user - hash the password
+            self._password_hash = self._hash_password(password)
+        else:
+            self._password_hash = None
+        
         self._is_active = is_active
     
     def _hash_password(self, password):
+        """Hash password using SHA256"""
         return hashlib.sha256(password.encode()).hexdigest()
     
     @property
     def email(self):
         return self._email
     
+    @email.setter
+    def email(self, value):
+        """Allow email to be updated"""
+        self._email = value.lower().strip()
+    
     @property
     def is_active(self):
         return self._is_active
     
     def verify_password(self, password):
+        """Verify password matches stored hash"""
+        if not password or not self._password_hash:
+            return False
         return self._password_hash == self._hash_password(password)
     
     def validate(self):
+        """Validate user data"""
         errors = []
         
         if not self._email:
@@ -42,9 +62,10 @@ class User(BaseModel):
         return len(errors) == 0, errors
     
     def to_dict(self):
+        """Convert user to dictionary"""
         return {
             'user_id': self._id,
             'email': self._email,
             'is_active': self._is_active,
-            'created_at': self._created_at.isoformat()
+            'created_at': self._created_at.isoformat() if self._created_at else None
         }
