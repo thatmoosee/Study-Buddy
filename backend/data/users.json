@@ -1,0 +1,14 @@
+{
+    "1": {
+        "id": 1,
+        "email": "mvquirk@ilstu.edu",
+        "_password_hash": "64cd87e3a1060cfdd86206c877ff7b726505d5f24e06d83a711ac2afad808d7b",
+        "_is_active": true
+    },
+    "2": {
+        "id": 2,
+        "email": "isu_mvquirk@ilstu.edu",
+        "_password_hash": "64cd87e3a1060cfdd86206c877ff7b726505d5f24e06d83a711ac2afad808d7b",
+        "_is_active": true
+    }
+}

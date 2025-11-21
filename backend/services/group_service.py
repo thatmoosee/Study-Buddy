@@ -1,4 +1,3 @@
-# services/group_service.py
 from models.group import Group
 
 class GroupService:
@@ -7,13 +6,17 @@ class GroupService:
     def __init__(self, group_repo):
         self.group_repo = group_repo
         
-    def create_group(self, name, user_id, members):
-        group = Group(name, user_id, members)
+    def create_group(self, name, owner_id, members):
+        """Create a new group"""
+        group = Group(name, owner_id, members)
         self.group_repo.add(group)
+        group.add_member(owner_id)
+        self.group_repo.update(group.id, group)
         return group
 
     def join_group(self, user_id, group_id):
-        group = self.group_repo.get(group_id)   # FIXED
+        """Add a user to a group"""
+        group = self.group_repo.get(group_id)
         if not group:
             raise ValueError("Group not found")
 
@@ -25,7 +28,8 @@ class GroupService:
         return group
         
     def leave_group(self, user_id, group_id):
-        group = self.group_repo.get(group_id)   # FIXED
+        """Remove a user from a group"""
+        group = self.group_repo.get(group_id)
         if not group:
             raise ValueError("Group not found")
 
@@ -37,4 +41,9 @@ class GroupService:
         return group
 
     def list_all_groups(self):
-        return list(self.group_repo.storage.values())  # FIXED
+        """List all groups"""
+        return self.group_repo.find_all()
+
+    def get_user_groups(self, user_id):
+        """Get all groups for a specific user"""
+        return self.group_repo.get_groups_for_user(user_id)

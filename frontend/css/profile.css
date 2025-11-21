@@ -1,0 +1,75 @@
+/* profile css file - by max quirk */
+main {
+    width: 85%;
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 30px;
+    background: #fff7eb;
+    border-radius: 14px;
+    box-shadow: 0px 4px 12px rgba(0,0,0,0.15);
+}
+
+h1 {
+    margin-top: 10px;
+    font-size: 2.4rem;
+}
+
+h2 {
+    margin-top: 40px;
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+}
+
+section {
+    padding: 20px;
+    margin-top: 10px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
+}
+
+input {
+    width: 80%;
+    padding: 10px;
+    margin-top: 8px;
+    border-radius: 6px;
+    border: 1px solid #aaa;
+    font-size: 1.1rem;
+}
+
+button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    background: #ffce75;
+    border: none;
+}
+
+#groupList {
+    list-style: none;
+    padding-left: 0;
+}
+
+.group-item {
+    background: #f8e3c4;
+    margin: 10px 0;
+    padding: 12px 15px;
+    font-size: 1.2rem;
+    border-radius: 10px;
+}
+
+#profile {
+    width: 130px;
+    border-radius: 50%;
+    margin-bottom: 15px;
+}
+
+.err {
+    color: red;
+}
+
+hr {
+    margin: 40px 0;
+}

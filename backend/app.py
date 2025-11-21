@@ -6,30 +6,32 @@ from services.group_service import GroupService
 from models.group import Group
 import os
 
-# Compute correct path to frontend directory (one level up)
+# Compute correct paths
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 FRONTEND_DIR = os.path.join(BASE_DIR, '..', 'frontend')
+DATA_DIR = os.path.join(BASE_DIR, 'data')  
+# Ensure data directory exists
+os.makedirs(DATA_DIR, exist_ok=True) 
 
 # Flask setup
 app = Flask(
     __name__,
-    static_folder=FRONTEND_DIR,       # Serve files from ../frontend
-    static_url_path=''                # So /index.html works at /
+    static_folder=FRONTEND_DIR,
+    static_url_path=''
 )
-app.secret_key = "super-secret-key" 
+app.secret_key = "our-secret-key" 
 
-# Initialize repositories and services
-user_storage = {}
-user_repo = UserRepository(user_storage)
+# Initialize repositories and services with absolute paths
+user_repo = UserRepository(os.path.join(DATA_DIR, 'users.json'))  
 auth_service = AuthService(user_repo)
 
-group_storage = {}
-group_repo = GroupRepository(group_storage)
+group_repo = GroupRepository(os.path.join(DATA_DIR, 'groups.json'))
 group_service = GroupService(group_repo)
 
-# ======================
+
+
 # FRONTEND ROUTES
-# ======================
+
 
 @app.route('/')
 def serve_index():
@@ -47,9 +49,9 @@ def serve_frontend(path):
         return send_from_directory(app.static_folder, 'index.html')
 
 
-# ======================
+
 # AUTHENTICATION ROUTES
-# ======================
+
 
 @app.route('/api/auth/register', methods=['POST'])
 def register():
@@ -106,9 +108,9 @@ def auth_status():
     return jsonify({'logged_in': False})
 
 
-# ======================
+
 # GROUP ROUTES
-# ======================
+
 
 @app.route('/api/group/create', methods=['POST'])
 def create_group():
@@ -186,7 +188,7 @@ def list_groups():
 
     # Get groups user belongs to
     groups = []
-    for g in group_repo.storage.values():
+    for g in group_repo.storage.values():  
         if user_id in g._members:
             groups.append({
                 'id': g.id,
@@ -201,9 +203,8 @@ def list_groups():
 
 
 
-# ======================
-# ENTRY POINT
-# ======================
+
+# main entry point
 
 if __name__ == '__main__':
     print("Study Buddy running at http://localhost:5000")
