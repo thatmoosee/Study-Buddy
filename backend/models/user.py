@@ -1,5 +1,5 @@
 from models.base_model import BaseModel
-import hashlib
+import bcrypt
 import re
 
 class User(BaseModel):
@@ -23,8 +23,9 @@ class User(BaseModel):
         self._is_active = is_active
     
     def _hash_password(self, password):
-        """Hash password using SHA256"""
-        return hashlib.sha256(password.encode()).hexdigest()
+        """Hash password using bcrypt with automatic salting"""
+        salt = bcrypt.gensalt()
+        return bcrypt.hashpw(password.encode(), salt).decode()
     
     @property
     def email(self):
@@ -43,7 +44,10 @@ class User(BaseModel):
         """Verify password matches stored hash"""
         if not password or not self._password_hash:
             return False
-        return self._password_hash == self._hash_password(password)
+        try:
+            return bcrypt.checkpw(password.encode(), self._password_hash.encode())
+        except (ValueError, AttributeError):
+            return False
     
     def validate(self):
         """Validate user data"""

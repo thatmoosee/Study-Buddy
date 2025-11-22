@@ -4,13 +4,14 @@ class Profile(BaseModel):
     """Profile model - Features 1.1.4, 1.1.5"""
     
     def __init__(self, user_id, name=None, major=None, availability=None,
-                 id=None, created_at=None, preferences=[0,0,0,0,0,0,0,0,0,0,0,0,0,0]):
+                 id=None, created_at=None, preferences=None):
         super().__init__(id, created_at)
         self._user_id = user_id
         self._name = name
         self._major = major
         self._availability = availability or []
-        self.preferences = preferences
+        # Fix mutable default argument - create new list each time
+        self.preferences = preferences if preferences is not None else [0]*14
     
     @property
     def user_id(self):

@@ -6,12 +6,11 @@ class GroupService:
     def __init__(self, group_repo):
         self.group_repo = group_repo
         
-    def create_group(self, name, owner_id, members):
+    def create_group(self, name, owner_id, members=None):
         """Create a new group"""
+        # Group constructor already adds owner to members, no need to do it again
         group = Group(name, owner_id, members)
         self.group_repo.add(group)
-        group.add_member(owner_id)
-        self.group_repo.update(group.id, group)
         return group
 
     def join_group(self, user_id, group_id):
@@ -37,7 +36,13 @@ class GroupService:
             raise ValueError("User not in this group")
 
         group.remove_member(user_id)
-        self.group_repo.update(group_id, group)
+
+        # Clean up orphan groups - delete if no members remain
+        if len(group._members) == 0:
+            self.group_repo.remove(group_id)
+        else:
+            self.group_repo.update(group_id, group)
+
         return group
 
     def list_all_groups(self):

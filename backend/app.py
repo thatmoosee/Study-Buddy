@@ -5,6 +5,14 @@ from repositories.group_repository import GroupRepository
 from services.group_service import GroupService
 from models.group import Group
 import os
+import secrets
+
+# Load environment variables from .env file if it exists
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass  # python-dotenv not installed, environment variables must be set manually
 
 # Compute correct paths
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -19,7 +27,8 @@ app = Flask(
     static_folder=FRONTEND_DIR,
     static_url_path=''
 )
-app.secret_key = "our-secret-key" 
+# Use environment variable for secret key, fallback to generated key
+app.secret_key = os.environ.get('SECRET_KEY') or secrets.token_hex(32) 
 
 # Initialize repositories and services with absolute paths
 user_repo = UserRepository(os.path.join(DATA_DIR, 'users.json'))  
@@ -55,9 +64,12 @@ def serve_frontend(path):
 
 @app.route('/api/auth/register', methods=['POST'])
 def register():
-    data = request.get_json()
-    if not data:
-        return jsonify({'success': False, 'error': 'Request body is required'}), 400
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'error': 'Request body is required'}), 400
+    except Exception:
+        return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
 
     try:
         email = data.get('email')
@@ -74,9 +86,12 @@ def register():
 
 @app.route('/api/auth/login', methods=['POST'])
 def login():
-    data = request.get_json()
-    if not data:
-        return jsonify({'success': False, 'error': 'Request body is required'}), 400
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'error': 'Request body is required'}), 400
+    except Exception:
+        return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
 
     try:
         email = data.get('email')
@@ -116,8 +131,14 @@ def auth_status():
 def create_group():
     if 'user_id' not in session:
         return jsonify({'success': False, 'error': 'Not logged in'}), 401
-    
-    data = request.get_json()
+
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'error': 'Request body is required'}), 400
+    except Exception:
+        return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
+
     name = data.get('name')
     members = data.get('members', [])
 
@@ -129,8 +150,8 @@ def create_group():
         group = group_service.create_group(name, owner_id, members)
         return jsonify({
             'success': True,
-            'message': f'Group {group._name} created successfully!',
-            'data': {'id': group.id, 'name': group._name, 'members': group._members}
+            'message': f'Group {group.name} created successfully!',
+            'data': group.to_dict()
         })
     except ValueError as e:
         return jsonify({'success': False, 'error': str(e)}), 400
@@ -141,8 +162,14 @@ def join_group():
     if 'user_id' not in session:
         return jsonify({'success': False, 'error': 'Not logged in'}), 401
 
-    data = request.get_json()
-    if not data or 'group_id' not in data:
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'error': 'Request body is required'}), 400
+    except Exception:
+        return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
+
+    if 'group_id' not in data:
         return jsonify({'success': False, 'error': 'Group ID is required'}), 400
 
     try:
@@ -151,8 +178,8 @@ def join_group():
         updated_group = group_service.join_group(user_id, group_id)
         return jsonify({
             'success': True,
-            'message': f'Group {updated_group._name} joined successfully!',
-            'data': {'id': updated_group.id, 'name': updated_group._name, 'members': updated_group._members}
+            'message': f'Group {updated_group.name} joined successfully!',
+            'data': updated_group.to_dict()
         })
     except ValueError as e:
         return jsonify({'success': False, 'error': str(e)}), 400
@@ -163,8 +190,14 @@ def leave_group():
     if 'user_id' not in session:
         return jsonify({'success': False, 'error': 'Not logged in'}), 401
 
-    data = request.get_json()
-    if not data or 'group_id' not in data:
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'error': 'Request body is required'}), 400
+    except Exception:
+        return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
+
+    if 'group_id' not in data:
         return jsonify({'success': False, 'error': 'Group ID is required'}), 400
 
     try:
@@ -173,7 +206,7 @@ def leave_group():
         updated_group = group_service.leave_group(user_id, group_id)
         return jsonify({
             'success': True,
-            'message': f'You have left {updated_group._name}.',
+            'message': f'You have left {updated_group.name}.',
             'data': updated_group.to_dict()
         })
     except ValueError as e:
@@ -186,15 +219,9 @@ def list_groups():
 
     user_id = session['user_id']
 
-    # Get groups user belongs to
-    groups = []
-    for g in group_repo.storage.values():  
-        if user_id in g._members:
-            groups.append({
-                'id': g.id,
-                'name': g._name,
-                'members': g._members
-            })
+    # Get groups user belongs to using service method
+    user_groups = group_service.get_user_groups(user_id)
+    groups = [g.to_dict() for g in user_groups]
 
     return jsonify({
         'success': True,
@@ -208,4 +235,6 @@ def list_groups():
 
 if __name__ == '__main__':
     print("Study Buddy running at http://localhost:5000")
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    # Only enable debug mode in development, and don't expose to all interfaces
+    is_dev = os.environ.get('FLASK_ENV') == 'development'
+    app.run(debug=is_dev, host='127.0.0.1', port=5000)
