@@ -228,7 +228,14 @@ def list_groups():
         'groups': groups
     })
 
-
+@app.route('/api/profile/upload', methods=['POST'])
+def upload_profile():
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'Not logged in'}), 401
+    data = request.get_json() or {}
+    user_id = session['user_id']
+    profile = profile_service.upload_profile(user_id, data)
+    return jsonify({'success': True, 'message':'Profile updated successfully', 'profile': profile.to_dict()})
 
 
 # main entry point
