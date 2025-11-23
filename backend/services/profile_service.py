@@ -31,3 +31,12 @@ class ProfileService:
     def get_profile_by_user_id(self, user_id):
         """Get profile by user ID"""
         return self._profile_repository.find_by_user_id(user_id)
+
+    def upload_profile(self, user_id, data):
+        """Upload profile"""
+        existing = self._profile_repository.find_by_id(user_id)
+        if existing:
+            return self._profile_repository.update(existing.id, data)
+
+        profile = Profile(user_id=user_id, name=data.get('name'), major=data.get('major'), availability=data.get('availability'))
+        return self._profile_repository.create(profile)
