@@ -2,7 +2,9 @@ from flask import Flask, request, jsonify, session, send_from_directory
 from services.auth_service import AuthService
 from repositories.user_repository import UserRepository
 from repositories.group_repository import GroupRepository
+from repositories.profile_repository import ProfileRepository
 from services.group_service import GroupService
+from services.profile_service import ProfileService
 from models.group import Group
 import os
 import secrets
@@ -31,8 +33,11 @@ app = Flask(
 app.secret_key = os.environ.get('SECRET_KEY') or secrets.token_hex(32) 
 
 # Initialize repositories and services with absolute paths
-user_repo = UserRepository(os.path.join(DATA_DIR, 'users.json'))  
+user_repo = UserRepository(os.path.join(DATA_DIR, 'users.json'))
+group_repo = GroupRepository(os.path.join(DATA_DIR, 'groups.json'))
+profile_repo = ProfileRepository(os.path.join(DATA_DIR, 'profiles.json'))
 auth_service = AuthService(user_repo)
+profile_service = ProfileService(profile_repo)
 
 group_repo = GroupRepository(os.path.join(DATA_DIR, 'groups.json'))
 group_service = GroupService(group_repo)

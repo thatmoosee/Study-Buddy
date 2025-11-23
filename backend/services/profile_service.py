@@ -34,7 +34,8 @@ class ProfileService:
 
     def upload_profile(self, user_id, data):
         """Upload profile"""
-        existing = self._profile_repository.find_by_id(user_id)
+
+        existing = self._profile_repository.find_by_user_id(user_id)
         if existing:
             return self._profile_repository.update(existing.id, data)
 
