@@ -1,0 +1,28 @@
+{
+    "1": {
+        "id": 1,
+        "user_id": 2,
+        "name": "Josh Topp",
+        "major": "Computer Science",
+        "availability": [
+            "Tues 8-10",
+            "Thurs 8-10"
+        ],
+        "preferences": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        ]
+    }
+}
