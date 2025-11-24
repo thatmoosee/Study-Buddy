@@ -4,5 +4,11 @@
         "email": "mvquirk@ilstu.edu",
         "_password_hash": "$2b$12$SPMprE1KZvi86mLFiXvEY.nau.9q47onV2LzwUCiyYyp8u4JteCJq",
         "_is_active": true
+    },
+    "2": {
+        "id": 2,
+        "email": "jatopp@ilstu.edu",
+        "_password_hash": "$2b$12$baH6AdHNkwRBji56P567veadTQP6DG4sCP3IqGD8Hxk55B1YyCPgm",
+        "_is_active": true
     }
 }

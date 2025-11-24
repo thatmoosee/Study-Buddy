@@ -6,5 +6,5 @@ Flask==3.0.0
 # Password Hashing (Security)
 bcrypt==4.1.2
 
-# Optional: Python-dotenv for .env file support
-python-dotenv==1.0.0
+# Email Service (SendGrid for password reset)
+sendgrid==6.11.0
