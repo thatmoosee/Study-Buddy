@@ -1,8 +1,10 @@
 from flask import Flask, request, jsonify, session, send_from_directory
 from services.auth_service import AuthService
+from services.email_service import EmailService
 from repositories.user_repository import UserRepository
 from repositories.group_repository import GroupRepository
 from repositories.profile_repository import ProfileRepository
+from repositories.password_reset_token_repository import PasswordResetTokenRepository
 from services.group_service import GroupService
 from services.profile_service import ProfileService
 from models.group import Group
@@ -38,6 +40,17 @@ group_repo = GroupRepository(os.path.join(DATA_DIR, 'groups.json'))
 profile_repo = ProfileRepository(os.path.join(DATA_DIR, 'profiles.json'))
 auth_service = AuthService(user_repo)
 profile_service = ProfileService(profile_repo)
+
+token_repo = PasswordResetTokenRepository(os.path.join(DATA_DIR, 'password_reset_tokens.json'))
+
+# Initialize email service (will raise error if SENDGRID_API_KEY not set)
+try:
+    email_service = EmailService()
+    auth_service = AuthService(user_repo, token_repo, email_service)
+except ValueError as e:
+    print(f"Warning: Email service not configured - {e}")
+    print("Password reset functionality will not be available")
+    auth_service = AuthService(user_repo)
 
 group_repo = GroupRepository(os.path.join(DATA_DIR, 'groups.json'))
 group_service = GroupService(group_repo)
@@ -126,6 +139,77 @@ def auth_status():
             }
         })
     return jsonify({'logged_in': False})
+
+
+@app.route('/api/auth/forgot-password', methods=['POST'])
+def forgot_password():
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'error': 'Request body is required'}), 400
+    except Exception:
+        return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
+
+    try:
+        email = data.get('email')
+        if not email:
+            return jsonify({'success': False, 'error': 'Email is required'}), 400
+
+        # Request password reset (returns None if user doesn't exist for security)
+        auth_service.request_password_reset(email)
+
+        # Always return success to prevent user enumeration
+        return jsonify({
+            'success': True,
+            'message': 'If an account exists with this email, password reset instructions have been sent.'
+        }), 200
+    except ValueError as e:
+        error_message = str(e)
+        # If it's a configuration error, return 503
+        if 'not configured' in error_message.lower():
+            return jsonify({'success': False, 'error': 'Password reset service is currently unavailable'}), 503
+        # For validation errors or email sending failures, return 400
+        return jsonify({'success': False, 'error': error_message}), 400
+    except Exception as e:
+        # Catch unexpected errors
+        print(f"Unexpected error in forgot_password: {str(e)}")
+        return jsonify({'success': False, 'error': 'An unexpected error occurred'}), 500
+
+
+@app.route('/api/auth/reset-password', methods=['POST'])
+def reset_password():
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'error': 'Request body is required'}), 400
+    except Exception:
+        return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
+
+    try:
+        token = data.get('token')
+        new_password = data.get('new_password')
+
+        if not token or not new_password:
+            return jsonify({'success': False, 'error': 'Token and new password are required'}), 400
+
+        # Reset password using token
+        user = auth_service.reset_password(token, new_password)
+
+        return jsonify({
+            'success': True,
+            'message': 'Password has been reset successfully. You can now login with your new password.'
+        }), 200
+    except ValueError as e:
+        error_message = str(e)
+        # If it's a configuration error, return 503
+        if 'not configured' in error_message.lower():
+            return jsonify({'success': False, 'error': 'Password reset service is currently unavailable'}), 503
+        # For invalid token or validation errors, return 400
+        return jsonify({'success': False, 'error': error_message}), 400
+    except Exception as e:
+        # Catch unexpected errors
+        print(f"Unexpected error in reset_password: {str(e)}")
+        return jsonify({'success': False, 'error': 'An unexpected error occurred'}), 500
 
 
 
