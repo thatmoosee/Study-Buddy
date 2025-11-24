@@ -43,6 +43,9 @@ document.getElementById("logoutBtn").addEventListener("click", async () => {
     window.location.href = "index.html";
 });
 
+document.getElementById("editProfileBtn").addEventListener("click", () => {
+    window.location.href = "editProfile.html";
+});
 /*
  create group pulls it from app.py api/group/create
 */

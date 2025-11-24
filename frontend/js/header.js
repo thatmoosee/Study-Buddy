@@ -2,11 +2,11 @@
 document.addEventListener('DOMContentLoaded', function() {
     const headerHTML = `
     <header>
-        <div>
-            <h1>Study Buddy</h1>
-        </div>
-        <nav>   <!-- FIXED -->
+        <nav>
             <ul>
+                <li class="logo">
+                    <img src="img/icon.png" alt="Studdy Buddy Logo" style="height: 35px;"/>
+                </li>
                 <li><a href="index.html">Home</a></li>
                 <li><a href="search.html">Search</a></li>
                 <li><a href="filter_by_class.html">Filter by Class</a></li>
