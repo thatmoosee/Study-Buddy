@@ -5,10 +5,12 @@ from repositories.group_repository import GroupRepository
 from repositories.profile_repository import ProfileRepository
 from repositories.notification_repository import NotificationRepository
 from repositories.study_scheduler_repository import StudySchedulerRepository
+from repositories.chat_repository import ChatRepository
 from services.group_service import GroupService
 from services.profile_service import ProfileService
 from services.notification_service import NotificationService
 from services.scheduler_services import SchedulerService
+from services.chat_service import ChatService
 from models.group import Group
 import os
 import secrets
@@ -42,10 +44,12 @@ group_repo = GroupRepository(os.path.join(DATA_DIR, 'groups.json'))
 profile_repo = ProfileRepository(os.path.join(DATA_DIR, 'profiles.json'))
 notification_repo = NotificationRepository(os.path.join(DATA_DIR, 'notifications.json'))
 study_scheduler_repo = StudySchedulerRepository(os.path.join(DATA_DIR, 'schedule.json'))
+chat_repo = ChatRepository(os.path.join(DATA_DIR, 'chat.json'))
 auth_service = AuthService(user_repo)
 profile_service = ProfileService(profile_repo)
 notification_service = NotificationService(notification_repo)
 study_scheduler_service = SchedulerService(study_scheduler_repo)
+chat_service = ChatService(chat_repo)
 
 group_repo = GroupRepository(os.path.join(DATA_DIR, 'groups.json'))
 group_service = GroupService(group_repo)
@@ -305,6 +309,77 @@ def create_study_schedule():
     except ValueError as e:
         return jsonify({'success': False, 'error': str(e)}), 400
 
+@app.route('/api/chat/create', methods=['POST'])
+def create_chat():
+    data =request.get_json() or {}
+    name = data.get('name')
+    owner_id = data.get('owner_id')
+    members = data.get('members', [])
+
+    if not name or not owner_id:
+        return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
+    chat = chat_service.create_chat(name, owner_id , members)
+    return jsonify({
+        'success': True,
+        'message': f'Chat created successfully!',
+        'study': chat.to_dict()
+    })
+
+@app.route('/api/chat/createDM', methods=['POST'])
+def create_DM():
+    data =request.get_json() or {}
+    user_id = data.get('user_id')
+    friend_id = data.get('friend_id')
+    if not user_id or not friend_id:
+        return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
+
+    chatDM = chat_service.create_DM(user_id, friend_id)
+    return jsonify({
+        'success': True,
+        'message': f'Chat created successfully!',
+        'study': chatDM.to_dict()
+    })
+
+@app.route('/api/chat/join', methods=['POST'])
+def send_message(chat_id):
+    data = request.get_json() or {}
+    message = data.get('message')
+    if not chat_id:
+        return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
+
+    chat = chat_service.send_message(chat_id, message)
+    return jsonify({
+        'success': True,
+        'message': f'Chat sent successfully!',
+        'study': chat.to_dict()
+    })
+
+@app.route('/api/chat/receive', methods=['POST'])
+def get_chat(chat_id):
+    chat = chat_repo.get(chat_id)
+    if not chat:
+        return jsonify({'success': False, 'error': 'Chat not found'}), 404
+
+    return jsonify({
+        'success': True,
+        'message': f'Chat received successfully!',
+        'study': chat.to_dict()
+    })
+
+@app.route('/api/chat/leave', methods=['POST'])
+def leave_chat(chat_id):
+    data = request.get_json() or {}
+    user_id = data.get('user_id')
+
+    if not chat_id:
+        return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
+
+    chat = chat_service.leave_chat(user_id, chat_id)
+    return jsonify({
+        'success': True,
+        'message': f'Chat leaved successfully!',
+        'study': chat.to_dict()
+    })
 
 # main entry point
 
