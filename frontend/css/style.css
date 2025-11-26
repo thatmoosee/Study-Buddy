@@ -31,8 +31,7 @@ ul li a:hover{
 }
 main{
     margin: auto;
-    width: 10vi;
-}   
+}
 main #profile{
     width: 35px;
     margin: 10px;
@@ -81,7 +80,8 @@ main button img{
     width: 15px;
 }
 main .chatbox{
-    margin: 10px;
+    margin: auto;
+    width: 34%;
 }
 main .chat{
     width: 500px;

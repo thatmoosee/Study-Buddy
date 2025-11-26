@@ -2,7 +2,7 @@ from models.base_model import BaseModel
 import uuid
 
 class Group(BaseModel):
-    def __init__(self, name, owner_id, members=None, id=None, created_at=None):
+    def __init__(self, name, owner_id, members=None, id=None, created_at=None, rating=0):
         # Call parent constructor with id (or generate new UUID)
         super().__init__(id or uuid.uuid4().hex, created_at)
         self._name = name
@@ -21,6 +21,12 @@ class Group(BaseModel):
     @property
     def owner_id(self):
         return self._owner_id
+    
+    def rating(self):
+        return self.rating
+    
+    def setRating(self, rate):
+        self.rating = rate
 
     @property
     def members(self):
