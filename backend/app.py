@@ -327,10 +327,6 @@ def upload_profile():
     return jsonify({'success': True, 'message':'Profile updated successfully', 'profile': profile.to_dict()})
 
 
-
-
-
-
 # main entry point
 
 if __name__ == '__main__':
