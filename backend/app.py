@@ -250,10 +250,10 @@ def list_all_groups():
         return jsonify({'success': False, 'error': 'Not logged in'}), 401
 
     all_groups = group_service.list_all_groups()
-
+    group_list = [group.to_dict() for group in all_groups]
     return jsonify({
         'success': True,
-        'all_groups': all_groups
+        'groups': group_list
     })
 
 @app.route('/api/profile/upload', methods=['POST'])

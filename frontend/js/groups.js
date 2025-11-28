@@ -9,16 +9,25 @@ async function loadAllGroups() {
 
     if(data.groups.length === 0 ){
         list.innerHTML = "<p>There are no groups.</p>";
-        return
+        return;
     }
 
     data.groups.forEach( g => {
         const li = document.createElement("li");
         li.className = "group-item";
-        li.textContent = `ID: ${g.id} — ${g.name}`;
+        li.textContent = `${g.name}`;
+
+        li.style.cursor = "pointer";
+        li.addEventListener("click", () => {
+            openGroupInfo(g);
+        });
         list.appendChild(li);
     })
 
+}
+
+function openGroupInfo(group){
+    alert(`Group Info:\nID: ${group.id}\nName: ${group.name}\nMembers: ${group.members.join(", ")}`);
 }
 
 
@@ -43,6 +52,19 @@ document.getElementById("filterConfirmBtn").addEventListener("click", () => {
     console.log("Filtering groups by:", filterValue);
 
     popup.style.display = "none";
+});
+
+function openGroupInfo(group) {
+    const popup = document.getElementById("groupInfoPopup");
+    document.getElementById("groupTitle").textContent = group.name;
+    document.getElementById("groupId").textContent = group.id;
+    document.getElementById("groupMembers").textContent = group.members.join(", ");
+
+    popup.style.display = "flex";
+}
+
+document.getElementById("groupInfoCloseBtn").addEventListener("click", () => {
+    document.getElementById("groupInfoPopup").style.display = "none";
 });
 
 
