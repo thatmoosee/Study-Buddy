@@ -1,0 +1,26 @@
+{
+    "e2608aa5439d46b48ec674be8550e354": {
+        "id": "e2608aa5439d46b48ec674be8550e354",
+        "name": "New Group",
+        "owner_id": 2,
+        "members": [
+            2
+        ]
+    },
+    "09a0a5cea1674ce3b7eb14c2311cb86f": {
+        "id": "09a0a5cea1674ce3b7eb14c2311cb86f",
+        "name": "old group",
+        "owner_id": 2,
+        "members": [
+            2
+        ]
+    },
+    "ebd3526a8d0146d888c1ed3bc7dfdf41": {
+        "id": "ebd3526a8d0146d888c1ed3bc7dfdf41",
+        "name": "old group 2",
+        "owner_id": 2,
+        "members": [
+            2
+        ]
+    }
+}

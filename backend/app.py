@@ -235,7 +235,6 @@ def list_groups():
         return jsonify({'success': False, 'error': 'Not logged in'}), 401
 
     user_id = session['user_id']
-
     # Get groups user belongs to using service method
     user_groups = group_service.get_user_groups(user_id)
     groups = [g.to_dict() for g in user_groups]
@@ -243,6 +242,18 @@ def list_groups():
     return jsonify({
         'success': True,
         'groups': groups
+    })
+
+@app.route('/api/group/listall', methods=['GET'])
+def list_all_groups():
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'Not logged in'}), 401
+
+    all_groups = group_service.list_all_groups()
+
+    return jsonify({
+        'success': True,
+        'all_groups': all_groups
     })
 
 @app.route('/api/profile/upload', methods=['POST'])

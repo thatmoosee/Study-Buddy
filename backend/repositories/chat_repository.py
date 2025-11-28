@@ -21,7 +21,7 @@ class ChatRepository(BaseRepository):
                 data = json.load(f)
             for c in data.values():
                 chat = Chat(
-                    user_id=c['user_id'],
+                    user_id=c['chat_id'],
                     name=c['name'],
                     message=c['messages'],
                     members=c['members']
@@ -40,7 +40,7 @@ class ChatRepository(BaseRepository):
             os.makedirs(directory, exist_ok=True)
 
         data = {str(chat.chat_id): {
-            'user_id': chat.chat_id,
+            'chat_id': chat.chat_id,
             'name': chat.name,
             'messages': chat.messages,
             'members': chat.members
