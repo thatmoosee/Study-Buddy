@@ -5,10 +5,9 @@ from validators.password_reset_validator import PasswordResetValidator
 class AuthService:
     """Authentication service"""
 
-    def __init__(self, user_repository, token_repository=None, email_service=None):
+    def __init__(self, user_repository, token_repository=None):
         self._user_repository = user_repository
         self._token_repository = token_repository
-        self._email_service = email_service
         self._validator = UserValidator()
         self._reset_validator = PasswordResetValidator()
 
@@ -34,8 +33,8 @@ class AuthService:
         session.clear()
 
     def request_password_reset(self, email):
-        """Initiate password reset process"""
-        if not self._token_repository or not self._email_service:
+        """Initiate password reset process - returns token for in-app display"""
+        if not self._token_repository:
             raise ValueError("Password reset functionality not configured")
 
         # Validate email format
@@ -53,23 +52,16 @@ class AuthService:
         self._token_repository.delete_expired_tokens()
 
         # Create reset token
-        from models.password_reset_token import PasswordResetToken
+        from models.password_reset import PasswordResetToken
         reset_token = PasswordResetToken(user_id=user.id)
         created_token = self._token_repository.create(reset_token)
 
-        # Send email with reset link
-        try:
-            self._email_service.send_password_reset_email(user.email, created_token.token)
-        except Exception as e:
-            # Delete the token if email fails
-            self._token_repository.delete(created_token.id)
-            raise ValueError(f"Failed to send reset email: {str(e)}")
-
+        # Return the token for in-app display (no email needed)
         return created_token
 
     def reset_password(self, token_string, new_password):
         """Reset password using valid token"""
-        if not self._token_repository or not self._email_service:
+        if not self._token_repository:
             raise ValueError("Password reset functionality not configured")
 
         # Validate inputs
@@ -103,11 +95,5 @@ class AuthService:
         # Mark token as used
         token.is_used = True
         self._token_repository.update(token.id, {'is_used': True})
-
-        # Send confirmation email (don't fail if this doesn't work)
-        try:
-            self._email_service.send_password_reset_confirmation(user.email)
-        except Exception as e:
-            print(f"Failed to send confirmation email: {str(e)}")
 
         return user
