@@ -38,7 +38,7 @@ document.getElementById("saveProfileBtn").addEventListener("click", async () => 
     }
 });
 
-document.getElementById("backToProfileBtn").addEventListener("click", () => {
+document.getElementById("CancelBtn").addEventListener("click", () => {
     window.location.href = "profile.html";
 });
 

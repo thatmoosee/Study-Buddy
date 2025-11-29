@@ -5,11 +5,11 @@ class GroupService:
 
     def __init__(self, group_repo):
         self.group_repo = group_repo
-        
-    def create_group(self, name, owner_id, members=None):
+
+    def create_group(self, name, owner_id, members=None, class_name=None, study_times=None):
         """Create a new group"""
         # Group constructor already adds owner to members, no need to do it again
-        group = Group(name, owner_id, members)
+        group = Group(name, owner_id, members, class_name, study_times)
         self.group_repo.add(group)
         return group
 
@@ -52,3 +52,22 @@ class GroupService:
     def get_user_groups(self, user_id):
         """Get all groups for a specific user"""
         return self.group_repo.get_groups_for_user(user_id)
+
+    def edit_group(self, group_id, specified_class=None, study_times=None):
+        group = self.group_repo.get(group_id)
+        if not group:
+            raise ValueError("Group not found")
+        if specified_class is not None:
+            group.specified_class = specified_class
+        if study_times is not None:
+            group.study_times = study_times
+        self.save_group(group)
+        return group
+
+    def filter_by_specified_class(self, specified_class):
+        """Filter groups by specific class"""
+        return self.group_repo.filter_by(specified_class=specified_class)
+
+    def filter_by_study_times(self, study_times):
+        """Filter groups by specific study times"""
+        return self.group_repo.filter_by(None, study_times=study_times)

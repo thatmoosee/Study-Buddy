@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 </li>
                 <li><a href="index.html">Home</a></li>
                 <li><a href="groups.html">Groups</a></li>
+                <li><a href="schedule.html">Schedule</a></li>
                 <li><a href="search.html">Search</a></li>
                 <li><a href="chats.html">Chats</a></li>
                 <li><a href="add_notifications.html">Notifications</a></li>

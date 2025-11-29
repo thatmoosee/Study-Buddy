@@ -158,13 +158,15 @@ def create_group():
 
     name = data.get('name')
     members = data.get('members', [])
+    class_name = data.get('specified_class')
+    study_times = data.get('study_times', [])
 
     if not name:
         return jsonify({'success': False, 'error': 'Group name is required'}), 400
 
     try:
         owner_id = session['user_id']
-        group = group_service.create_group(name, owner_id, members)
+        group = group_service.create_group(name, owner_id, members, class_name, study_times)
         return jsonify({
             'success': True,
             'message': f'Group {group.name} created successfully!',
@@ -246,9 +248,6 @@ def list_groups():
 
 @app.route('/api/group/listall', methods=['GET'])
 def list_all_groups():
-    if 'user_id' not in session:
-        return jsonify({'success': False, 'error': 'Not logged in'}), 401
-
     all_groups = group_service.list_all_groups()
     group_list = [group.to_dict() for group in all_groups]
     return jsonify({
@@ -391,6 +390,59 @@ def leave_chat(chat_id):
         'message': f'Chat leaved successfully!',
         'study': chat.to_dict()
     })
+
+@app.route('/api/group/edit', methods=['POST'])
+def edit_group(group_id):
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'Not logged in'}), 401
+
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
+
+        specified_class = data.get('specified_class')
+        study_times = data.get('study_times')
+        if not specified_class or not study_times:
+            return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
+
+        group = group_service.get(group_id)
+        if group.owner_id != session['user_id']:
+            return jsonify({'success': False, 'error': 'Not Owner'}), 401
+
+        updated_group = group_service.edit_group(group_id, specified_class, study_times)
+        return jsonify({
+            'success': True,
+            'message': f'Group updated successfully!',
+            'study': updated_group.to_dict()
+        })
+
+    except ValueError as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
+
+
+@app.route('/api/group/filter', methods=['POST'])
+def filter_groups():
+    data = request.get_json()
+    filter_type = data.get('type')
+    value = data.get('value')
+    print(filter_type, value)
+    if filter_type == "class":
+        groups = group_service.filter_by_specified_class(value)
+    elif filter_type == "study":
+        groups = group_service.filter_by_study_times(value)
+    else:
+        return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
+
+    for group in groups:
+        print(group)
+
+    return jsonify({
+        'success': True,
+        'message': f'Groups filtered successfully!',
+        "groups": [group.to_dict() for group in groups]
+    })
+
 
 # main entry point
 

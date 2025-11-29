@@ -11,11 +11,12 @@
 <body>
     <div id="header-placeholder"></div>
 
-    <main style="test-align:center;">
+    <main style="text-align:center;">
         <section>
             <h2>Groups</h2>
-            <ul id="groupList"></ul>
             <hr>
+            <ul id="groupList"></ul>
+            <br>
             <input id="newGroupName" placeholder="Group Name">
             <br>
             <button id="createGroupBtn">Create</button>
@@ -26,12 +27,25 @@
             <p id="createGroupError" class="err"></p>
             <p id="leaveGroupError" class="err"></p>
         </section>
+        <section>
+            <h2>Schedule Study Session</h2>
+            <form id="scheduleForm">
+            <label for="title">Group Title:</label>
+            <input type="text" id="title" name="title" required><br><br>
+            <label for="start_time">Start:</label>
+            <input type="text" id="start_time" name="start_time" required><br><br>
+            <label for="end_time">End:</label>
+            <input type="text" id="end_time" name="end_time" required><br><br>
 
+            <button type="submit">Create Schedule</button>
+        </form>
+
+        </section>
 
         <section>
             <h2>Group list</h2>
-            <button id="FilterGroup">Filter</button>
             <hr>
+            <button id="FilterGroup">Filter</button>
             <div id="filterPopup" class="popup">
                 <div class="popup-content">
                     <h3>Filter Groups</h3>
@@ -54,10 +68,29 @@
             <div class="popup-content">
                 <h3 id="groupTitle"></h3>
                 <p><strong>ID:</strong> <span id="groupId"></span></p>
-                <p><strong>Members:</strong> <span id="groupMembers"></span></p>
+                <p><strong>Member(s):</strong> <span id="groupMembers"></span></p>
+                <p><strong>Class:</strong> <span id="specifiedClass"></span></p>
+                <p><strong>Time(s):</strong> <span id="studyTimes"></span></p>
                 <button id="groupInfoCloseBtn">Close</button>
             </div>
         </div>
+        <div id="createGroupPopup" class="popup">
+        <div class="popup-content">
+            <h3>Create Group Details</h3>
+            <p><strong>Group Name:</strong> <span id="newGroupDisplay"></span></p>
+
+            <label>Class:
+                <input id="newGroupClass" placeholder="Enter class">
+            </label>
+            <br><br>
+            <label>Study Times:
+                <input id="newGroupTimes" placeholder="Enter time(s)">
+            </label>
+            <br><br>
+            <button id="createGroupConfirmBtn">Create</button>
+            <button id="createGroupCancelBtn">Cancel</button>
+        </div>
+</div>
     </main>
     <script src="js/header.js"></script>
     <script src="js/profile.js"></script>
