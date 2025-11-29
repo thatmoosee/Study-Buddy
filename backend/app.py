@@ -3,10 +3,16 @@ from services.auth_service import AuthService
 from services.email_service import EmailService
 from repositories.user_repository import UserRepository
 from repositories.group_repository import GroupRepository
+from repositories.notification_repository import NotificationRepository
+from repositories.study_scheduler_repository import StudySchedulerRepository
+from repositories.chat_repository import ChatRepository
 from repositories.profile_repository import ProfileRepository
 from repositories.password_reset_token_repository import PasswordResetTokenRepository
 from services.group_service import GroupService
 from services.profile_service import ProfileService
+from services.notification_service import NotificationService
+from services.scheduler_services import SchedulerService
+from services.chat_service import ChatService
 from models.group import Group
 import os
 import secrets
@@ -38,8 +44,14 @@ app.secret_key = os.environ.get('SECRET_KEY') or secrets.token_hex(32)
 user_repo = UserRepository(os.path.join(DATA_DIR, 'users.json'))
 group_repo = GroupRepository(os.path.join(DATA_DIR, 'groups.json'))
 profile_repo = ProfileRepository(os.path.join(DATA_DIR, 'profiles.json'))
+notification_repo = NotificationRepository(os.path.join(DATA_DIR, 'notifications.json'))
+study_scheduler_repo = StudySchedulerRepository(os.path.join(DATA_DIR, 'study_scheduler.json'))
+chat_repo = ChatRepository(os.path.join(DATA_DIR, 'chat.json'))
 auth_service = AuthService(user_repo)
 profile_service = ProfileService(profile_repo)
+notification_service = NotificationService(notification_repo)
+study_scheduler_service = SchedulerService(study_scheduler_repo)
+chat_service = ChatService(chat_repo)
 
 token_repo = PasswordResetTokenRepository(os.path.join(DATA_DIR, 'password_reset_tokens.json'))
 
@@ -325,6 +337,152 @@ def upload_profile():
     user_id = session['user_id']
     profile = profile_service.upload_profile(user_id, data)
     return jsonify({'success': True, 'message':'Profile updated successfully', 'profile': profile.to_dict()})
+
+
+@app.route('/api/group/listall', methods=['GET'])
+def list_all_groups():
+    all_groups = group_service.list_all_groups()
+    group_list = [group.to_dict() for group in all_groups]
+    return jsonify({
+        'success': True,
+        'groups': group_list
+    })
+
+
+@app.route("/api/notifications", methods=['GET'])
+def get_notifications():
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'Not logged in'}), 401
+
+    user_id = session['user_id']
+    notifications = notification_service.get_notifications(user_id)
+
+    return jsonify({
+        'success': True,
+        'notifications': notifications
+    })
+
+
+@app.route("/api/notifications/read", methods=['POST'])
+def mark_notification_as_read():
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'Not logged in'}), 401
+
+    data = request.get_json() or {}
+    notification_id = data.get('id')
+
+    if not notification_id:
+        return jsonify({'success': False, 'error': 'Notification ID is required'}), 400
+
+    try:
+        notification = notification_service.mark_notifications_as_read(notification_id)
+        return jsonify({"success": True, "notification": notification.to_dict()})
+    except ValueError as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
+
+@app.route("/api/study_schedule/create", methods=['POST'])
+def create_study_schedule():
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'Not logged in'}), 401
+
+    data = request.get_json() or {}
+    title = data.get('title')
+    start_time = data.get('start_time')
+    end_time = data.get('end_time')
+
+    if not title or not start_time or not end_time:
+        return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
+
+    user_id = session['user_id']
+    try:
+        schedule = study_scheduler_service.create_study_scheduler(user_id, title, start_time, end_time)
+        return jsonify({
+            'success': True,
+            'message': f'Study schedule created successfully!',
+            'study': schedule.to_dict()
+        })
+    except ValueError as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
+
+@app.route('/api/chat/create', methods=['POST'])
+def create_chat():
+    data =request.get_json() or {}
+    name = data.get('name')
+    owner_id = data.get('owner_id')
+    members = data.get('members', [])
+
+    if not name or not owner_id:
+        return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
+    chat = chat_service.create_chat(name, owner_id , members)
+    return jsonify({
+        'success': True,
+        'message': f'Chat created successfully!',
+        'study': chat.to_dict()
+    })
+
+@app.route('/api/chat/join', methods=['POST'])
+def send_message(chat_id):
+    data = request.get_json() or {}
+    message = data.get('message')
+    if not chat_id:
+        return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
+
+    chat = chat_service.send_message(chat_id, message)
+    return jsonify({
+        'success': True,
+        'message': f'Chat sent successfully!',
+        'study': chat.to_dict()
+    })
+
+@app.route('/api/chat/receive', methods=['POST'])
+def get_chat(chat_id):
+    chat = chat_repo.get(chat_id)
+    if not chat:
+        return jsonify({'success': False, 'error': 'Chat not found'}), 404
+
+    return jsonify({
+        'success': True,
+        'message': f'Chat received successfully!',
+        'study': chat.to_dict()
+    })
+
+@app.route('/api/chat/leave', methods=['POST'])
+def leave_chat(chat_id):
+    data = request.get_json() or {}
+    user_id = data.get('user_id')
+
+    if not chat_id:
+        return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
+
+    chat = chat_service.leave_chat(user_id, chat_id)
+    return jsonify({
+        'success': True,
+        'message': f'Chat leaved successfully!',
+        'study': chat.to_dict()
+    })
+
+@app.route('/api/group/filter', methods=['POST'])
+def filter_groups():
+    data = request.get_json()
+    filter_type = data.get('type')
+    value = data.get('value')
+    print(filter_type, value)
+    if filter_type == "class":
+        groups = group_service.filter_by_specified_class(value)
+    elif filter_type == "study":
+        groups = group_service.filter_by_study_times(value)
+    else:
+        return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
+
+    for group in groups:
+        print(group)
+
+    return jsonify({
+        'success': True,
+        'message': f'Groups filtered successfully!',
+        "groups": [group.to_dict() for group in groups]
+    })
+
 
 
 # main entry point

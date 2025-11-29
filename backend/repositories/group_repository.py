@@ -23,9 +23,11 @@ class GroupRepository(BaseRepository):
                     data = json.load(f)
                 for g in data.values():
                     group = Group(
-                        name=g['_name'],
-                        owner_id=g['_owner_id'],
-                        members=g['_members']
+                        name=g['name'],
+                        owner_id=g['owner_id'],
+                        members=g['members'],
+                        study_times=g['study_times'],
+                        specified_class=g['specified_class']
                     )
                     group.id = g['id']
                     self._storage[group.id] = group
@@ -86,7 +88,7 @@ class GroupRepository(BaseRepository):
 
     def get_groups_for_user(self, user_id):
         """Get all groups that a user is a member of"""
-        return [g for g in self._storage.values() if user_id in g._members]
+        return [g for g in self._storage.values() if user_id in g.members]
 
     def remove(self, group_id):
         """Delete a group"""
@@ -95,3 +97,22 @@ class GroupRepository(BaseRepository):
             self._save_data()
             return True
         raise ValueError("Group not found")
+
+    def save_group_info(self, group):
+        self._storage[group.id] = group
+        self._save_data()
+
+    def filter_by(self, specified_class=None, study_times=None):
+        """Filter groups by specific class"""
+        groups = []
+        for group in self._storage.values():
+            if specified_class is not None:
+                if specified_class not in group.specified_class():
+                    continue
+            if study_times is not None:
+                if study_times not in group.study_times():
+                    continue
+
+            groups.append(group)
+
+        return groups

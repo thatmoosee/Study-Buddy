@@ -2,7 +2,7 @@ from models.base_model import BaseModel
 import uuid
 
 class Group(BaseModel):
-    def __init__(self, name, owner_id, members=None, id=None, created_at=None, rating=0):
+    def __init__(self, name, owner_id, members=None, specified_class = None, study_times = None, id=None, created_at=None, rating=0):
         # Call parent constructor with id (or generate new UUID)
         super().__init__(id or uuid.uuid4().hex, created_at)
         self._name = name
@@ -13,6 +13,9 @@ class Group(BaseModel):
         else:
             # Use set to remove duplicates, then convert to list
             self._members = list(set([owner_id] + members))
+
+        self._study_times = study_times
+        self._specified_class = specified_class
             
     @property
     def name(self):
@@ -27,6 +30,12 @@ class Group(BaseModel):
     
     def setRating(self, rate):
         self.rating = rate
+
+    def specified_class(self):
+        return self._specified_class
+
+    def study_times(self):
+        return self._study_times
 
     @property
     def members(self):
@@ -64,7 +73,9 @@ class Group(BaseModel):
             'id': self.id,
             'name': self._name,
             'owner_id': self._owner_id,
-            'members': self._members
+            'members': self._members,
+            'study_times': self._study_times,
+            'specified_class': self._specified_class
         }
 
     def validate(self):

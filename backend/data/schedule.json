@@ -1,0 +1,9 @@
+{
+    "1": {
+        "id": 1,
+        "user_id": 2,
+        "title": "CompSci Session",
+        "start_time": "Mon 10",
+        "end_time": "Mon 12"
+    }
+}

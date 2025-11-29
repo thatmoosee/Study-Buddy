@@ -33,7 +33,13 @@ async function loadGroups() {
     data.groups.forEach(g => {
         const li = document.createElement("li");
         li.className = "group-item";
-        li.textContent = `ID: ${g.id} — ${g.name}`;
+        li.textContent = `${g.name}`;
+
+        li.style.cursor = "pointer";
+        li.addEventListener("click", () => {
+            openGroupInfo(g);
+        });
+
         list.appendChild(li);
     });
 }
@@ -41,6 +47,10 @@ async function loadGroups() {
 document.getElementById("logoutBtn").addEventListener("click", async () => {
     await fetch("/api/auth/logout", { method: "POST" });
     window.location.href = "index.html";
+});
+
+document.getElementById("editProfileBtn").addEventListener("click", () => {
+    window.location.href = "editProfile.html";
 });
 
 /*
@@ -74,7 +84,7 @@ document.getElementById("createGroupBtn").addEventListener("click", async () => 
 Join a group
 */
 document.getElementById("joinGroupBtn").addEventListener("click", async () => {
-    const id = document.getElementById("joinGroupId").value.trim();
+    const id = document.getElementById("newGroupName").value.trim();
     const err = document.getElementById("joinGroupError");
     err.textContent = "";
 
@@ -101,7 +111,7 @@ document.getElementById("joinGroupBtn").addEventListener("click", async () => {
 Leave a group
 */
 document.getElementById("leaveGroupBtn").addEventListener("click", async () => {
-    const id = document.getElementById("leaveGroupId").value.trim();
+    const id = document.getElementById("newGroupName").value.trim();
     const err = document.getElementById("leaveGroupError");
     err.textContent = "";
 
