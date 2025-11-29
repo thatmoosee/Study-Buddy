@@ -1,7 +1,7 @@
 """
 Notification model for user alerts and updates
 
-Built by:
+Built by: Josh Topp
 """
 
 class Notification:

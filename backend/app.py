@@ -407,11 +407,28 @@ def create_study_schedule():
     except ValueError as e:
         return jsonify({'success': False, 'error': str(e)}), 400
 
+@app.route('/api/chat/join', methods=['POST'])
+def join_chat():
+    data = request.get_json() or {}
+    chat_id = int(data.get('chat_id'))
+    user_id = session['user_id']
+    print(chat_id, user_id)
+    if not chat_id or not user_id:
+        return jsonify({'success': False, 'error': 'Invalid JSON format'}), 401
+
+    chat = chat_service.join_chat(user_id, chat_id)
+    print(chat)
+    return jsonify({
+        'success': True,
+        'message': f'Chat joined successfully!',
+        'chats': chat.to_dict()
+    })
+
 @app.route('/api/chat/create', methods=['POST'])
 def create_chat():
     data =request.get_json() or {}
     name = data.get('name')
-    owner_id = data.get('owner_id')
+    owner_id = session['user_id']
     members = data.get('members', [])
 
     if not name or not owner_id:
@@ -420,17 +437,20 @@ def create_chat():
     return jsonify({
         'success': True,
         'message': f'Chat created successfully!',
-        'study': chat.to_dict()
+        'chats': chat.to_dict()
     })
 
-@app.route('/api/chat/join', methods=['POST'])
-def send_message(chat_id):
+@app.route('/api/chat/send', methods=['POST'])
+def send_message():
     data = request.get_json() or {}
+    chat_id = int(data.get('chat_id'))
     message = data.get('message')
+    user_id = session['user_id']
     if not chat_id:
         return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
-
-    chat = chat_service.send_message(chat_id, message)
+    print(chat_id, user_id, message)
+    chat = chat_service.send_message(user_id, chat_id, message)
+    print(chat)
     return jsonify({
         'success': True,
         'message': f'Chat sent successfully!',
@@ -438,21 +458,23 @@ def send_message(chat_id):
     })
 
 @app.route('/api/chat/receive', methods=['POST'])
-def get_chat(chat_id):
-    chat = chat_repo.get(chat_id)
+def get_chat():
+    data = request.get_json() or {}
+    chat = data.get('chat')
     if not chat:
         return jsonify({'success': False, 'error': 'Chat not found'}), 404
 
     return jsonify({
         'success': True,
         'message': f'Chat received successfully!',
-        'study': chat.to_dict()
+        'chats': chat.to_dict()
     })
 
 @app.route('/api/chat/leave', methods=['POST'])
-def leave_chat(chat_id):
+def leave_chat():
     data = request.get_json() or {}
-    user_id = data.get('user_id')
+    chat_id = int(data.get('chat_id'))
+    user_id = session['user_id']
 
     if not chat_id:
         return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
@@ -461,7 +483,21 @@ def leave_chat(chat_id):
     return jsonify({
         'success': True,
         'message': f'Chat leaved successfully!',
-        'study': chat.to_dict()
+        'chats': chat.to_dict()
+    })
+
+@app.route('/api/chat/listallchats', methods=['GET'])
+def list_all_chats():
+    user_id = session['user_id']
+    if not user_id:
+        return jsonify({'success': False, 'error': 'Not logged in'}), 401
+
+    user_chats = chat_service.list_all_chats(user_id)
+    print(user_chats)
+    return jsonify({
+        'success': True,
+        'message': f'Chat listed successfully!',
+        'chats': user_chats
     })
 
 @app.route('/api/group/filter', methods=['POST'])

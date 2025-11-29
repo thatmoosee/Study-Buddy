@@ -1,7 +1,7 @@
 """
 Study scheduler model for managing study sessions
 
-Built by:
+Built by: Josh Topp
 """
 
 from models.base_model import BaseModel

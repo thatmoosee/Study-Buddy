@@ -1,3 +1,10 @@
+"""
+Chat repository for managing user chats updating and making them
+
+Built by: Josh Topp
+"""
+
+
 import json
 import os
 from models.chat import Chat
@@ -21,14 +28,14 @@ class ChatRepository(BaseRepository):
                 data = json.load(f)
             for c in data.values():
                 chat = Chat(
-                    user_id=c['chat_id'],
+                    chat_id=c['chat_id'],
                     name=c['name'],
-                    message=c['messages'],
+                    messages=c['messages'],
                     members=c['members']
                 )
-                self._storage[chat.id] = chat
-                if chat.id >= self._id_counter:
-                    self._id_counter = chat.id + 1
+                self._storage[chat.chat_id] = chat
+                if chat.chat_id >= self._id_counter:
+                    self._id_counter = chat.chat_id + 1
         except (FileNotFoundError, json. JSONDecodeError) as e:
             print(f"No exisiting chat data or error loading: {e}")
             self._storage = {}
@@ -69,7 +76,7 @@ class ChatRepository(BaseRepository):
     def update(self, chat_id, chat):
         if chat_id in self._storage:
             self._storage[chat_id] = chat
-            self._save_data()
+            self._save_to_file()
             return chat
         raise ValueError("Chat not found")
 

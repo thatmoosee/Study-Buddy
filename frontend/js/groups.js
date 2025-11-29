@@ -1,3 +1,16 @@
+async function checkAuth() {
+    const res = await fetch("/api/auth/status");
+    const data = await res.json();
+
+    if (!data.logged_in) {
+        window.location.href = "index.html";
+        return;
+    }
+
+    document.getElementById("userEmail").textContent =
+        "Logged in as: " + data.user.email;
+}
+
 async function loadFilteredGroups(filterType, filterValue){
     const res = await fetch("/api/group/filter", {
         method: "POST",
@@ -193,5 +206,6 @@ createConfirmBtn.addEventListener("click", async () => {
     loadGroups();
     loadAllGroups();
 });
+checkAuth();
 loadGroups();
 loadAllGroups();

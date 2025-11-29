@@ -1,3 +1,28 @@
 {
-
+    "1": {
+        "chat_id": 1,
+        "name": "Test",
+        "messages": [
+            "hello",
+            "hello",
+            "test",
+            "hello"
+        ],
+        "members": [
+            2,
+            3
+        ]
+    },
+    "2": {
+        "chat_id": 2,
+        "name": "Test1",
+        "messages": null,
+        "members": []
+    },
+    "3": {
+        "chat_id": 3,
+        "name": "Test1",
+        "messages": null,
+        "members": []
+    }
 }

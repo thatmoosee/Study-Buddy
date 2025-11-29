@@ -1,7 +1,7 @@
 """
 Notification repository for managing user notifications
 
-Built by:
+Built by: Josh Topp
 """
 
 import json

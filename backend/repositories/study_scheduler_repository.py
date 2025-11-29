@@ -1,7 +1,7 @@
 """
 Study scheduler repository for session management
 
-Built by:
+Built by: Josh Topp
 """
 
 
