@@ -13,12 +13,14 @@ from repositories.base_repository import BaseRepository
 class PasswordResetTokenRepository(BaseRepository):
     """Password reset token repository with JSON persistence"""
 
+    # Internal helper method to init
     def __init__(self, json_file):
         self._json_file = os.path.abspath(json_file)
         self._storage = {}
         self._id_counter = 1
         self._load_from_file()
 
+    # Load data from storage into memory for processing
     def _load_from_file(self):
         """Load tokens from JSON file"""
         try:
@@ -41,6 +43,7 @@ class PasswordResetTokenRepository(BaseRepository):
             self._storage = {}
             self._id_counter = 1
 
+    # Save data from memory to persistent storage
     def _save_to_file(self):
         """Save tokens to JSON file"""
         directory = os.path.dirname(self._json_file)
@@ -59,6 +62,7 @@ class PasswordResetTokenRepository(BaseRepository):
         with open(self._json_file, 'w') as f:
             json.dump(data, f, indent=4)
 
+    # Create new entity with validation and persist to storage
     def create(self, entity):
         """Create new reset token"""
         if not isinstance(entity, PasswordResetToken):
@@ -75,6 +79,7 @@ class PasswordResetTokenRepository(BaseRepository):
         self._save_to_file()
         return entity
 
+    # Find and return entity by its unique identifier
     def find_by_id(self, entity_id):
         """Find token by ID"""
         for token in self._storage.values():
@@ -82,18 +87,22 @@ class PasswordResetTokenRepository(BaseRepository):
                 return token
         return None
 
+    # Retrieve and return all entities from storage
     def find_all(self):
         """Return all tokens"""
         return list(self._storage.values())
 
+    # Find and return entity matching criteria
     def find_by_token(self, token_string):
         """Find token by token string"""
         return self._storage.get(token_string)
 
+    # Find and return entities associated with specific user
     def find_by_user_id(self, user_id):
         """Find all tokens for a user"""
         return [token for token in self._storage.values() if token.user_id == user_id]
 
+    # Update entity data and persist changes to storage
     def update(self, entity_id, updated_data):
         """Update token by ID"""
         token = self.find_by_id(entity_id)
@@ -106,6 +115,7 @@ class PasswordResetTokenRepository(BaseRepository):
         self._save_to_file()
         return token
 
+    # Remove entity from storage permanently or from collection
     def delete(self, entity_id):
         """Delete token by ID"""
         token = self.find_by_id(entity_id)
@@ -116,6 +126,7 @@ class PasswordResetTokenRepository(BaseRepository):
         self._save_to_file()
         return True
 
+    # Remove entity from storage permanently or from collection
     def delete_expired_tokens(self):
         """Clean up expired and used tokens"""
         tokens_to_delete = []

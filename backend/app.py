@@ -7,6 +7,7 @@ from flask import Flask, request, jsonify, session, send_from_directory
 from services.auth_service import AuthService
 from repositories.user_repository import UserRepository
 from repositories.group_repository import GroupRepository
+from repositories.friend_repository import FriendRepository
 from repositories.notification_repository import NotificationRepository
 from repositories.study_scheduler_repository import StudySchedulerRepository
 from repositories.chat_repository import ChatRepository
@@ -17,6 +18,7 @@ from services.profile_service import ProfileService
 from services.notification_service import NotificationService
 from services.scheduler_services import SchedulerService
 from services.chat_service import ChatService
+from services.friend_service import FriendService
 from models.group import Group
 import os
 import secrets
@@ -43,10 +45,12 @@ user_repo = UserRepository(os.path.join(DATA_DIR, 'users.json'))
 token_repo = PasswordResetTokenRepository(os.path.join(DATA_DIR, 'password_reset_tokens.json'))
 group_repo = GroupRepository(os.path.join(DATA_DIR, 'groups.json'))
 profile_repo = ProfileRepository(os.path.join(DATA_DIR, 'profiles.json'))
+friend_repo = FriendRepository(os.path.join(DATA_DIR, 'friends.json'))
 notification_repo = NotificationRepository(os.path.join(DATA_DIR, 'notifications.json'))
 study_scheduler_repo = StudySchedulerRepository(os.path.join(DATA_DIR, 'study_scheduler.json'))
 chat_repo = ChatRepository(os.path.join(DATA_DIR, 'chat.json'))
 auth_service = AuthService(user_repo, token_repo)
+friend_service = FriendService(friend_repo)
 profile_service = ProfileService(profile_repo)
 notification_service = NotificationService(notification_repo)
 study_scheduler_service = SchedulerService(study_scheduler_repo)
@@ -143,6 +147,7 @@ def auth_status():
 
 @app.route('/api/auth/forgot-password', methods=['POST'])
 def forgot_password():
+    """Request password reset - generates token for in-app use"""
     try:
         data = request.get_json()
         if not data:
@@ -152,25 +157,27 @@ def forgot_password():
 
     try:
         email = data.get('email')
+
         if not email:
             return jsonify({'success': False, 'error': 'Email is required'}), 400
 
-        # Request password reset (returns token or None if user doesn't exist)
+        # Request password reset token
         reset_token = auth_service.request_password_reset(email)
 
-        # If token was created, return it for in-app display
         if reset_token:
+            # Return token for in-app display (no email sending)
             return jsonify({
                 'success': True,
-                'message': 'Password reset token generated successfully.',
+                'message': 'Password reset link generated successfully.',
                 'token': reset_token.token
             }), 200
         else:
-            # User doesn't exist, but return success to prevent user enumeration
+            # User doesn't exist, but don't reveal this for security
             return jsonify({
                 'success': True,
-                'message': 'If an account exists with this email, a reset token has been generated.'
+                'message': 'If an account exists with this email, a reset link has been generated.'
             }), 200
+
     except ValueError as e:
         error_message = str(e)
         # If it's a configuration error, return 503

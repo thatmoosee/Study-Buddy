@@ -92,7 +92,7 @@ class UserRepository(BaseRepository):
         user = self.find_by_id(entity_id)
         if not user:
             raise ValueError("User not found")
-        
+
         # Update user attributes
         if 'email' in updated_data:
             # Remove old email key and add new one
@@ -100,10 +100,13 @@ class UserRepository(BaseRepository):
             user.email = updated_data['email']
             del self._storage[old_email]
             self._storage[user.email] = user
-        
+
         if 'is_active' in updated_data:
             user._is_active = updated_data['is_active']
-        
+
+        if 'password_hash' in updated_data:
+            user._password_hash = updated_data['password_hash']
+
         self._save_to_file()
         return user
 

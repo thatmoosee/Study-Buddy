@@ -2,11 +2,7 @@
     "1": {
         "id": 1,
         "email": "mvquirk@ilstu.edu",
-<<<<<<< HEAD
-        "_password_hash": "$2b$12$CmzTCQCtb9/wgaW/6GeGy.qHJV.07siiQfzS.4wGbJ3kLBW4wRYL2",
-=======
-        "_password_hash": "$2b$12$j9X0vXyINI7viqR6WwnxYed2OM9zXl9T3TUsYaVhMQCsH/V7qvXQm",
->>>>>>> 684654b21a1c1be8c2b2b18784eb43a5148f32f1
+        "_password_hash": "$2b$12$qr715FzjbR1BzgQQjPnRVegJEcZjpwmnpclVpG/TM4uggZ3J9T7Qu",
         "_is_active": true
     },
     "2": {

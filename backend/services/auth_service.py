@@ -38,6 +38,7 @@ class AuthService:
     def logout(self, session):
         session.clear()
 
+    # Reset user password using secure token verification
     def request_password_reset(self, email):
         """Initiate password reset process - returns token for in-app display"""
         if not self._token_repository:
@@ -64,7 +65,8 @@ class AuthService:
 
         # Return the token for in-app display (no email needed)
         return created_token
-    
+
+    # Reset user password using secure token verification
     def reset_password(self, token_string, new_password):
         """Reset password using valid token"""
         if not self._token_repository:
@@ -93,10 +95,10 @@ class AuthService:
             raise ValueError("User not found")
 
         # Update password (User model handles hashing)
-        user._password_hash = user._hash_password(new_password)
+        new_hash = user._hash_password(new_password)
 
-        # Save updated user
-        self._user_repository.update(user.id, {})
+        # Save updated user with new password hash
+        self._user_repository.update(user.id, {'password_hash': new_hash})
 
         # Mark token as used
         token.is_used = True
