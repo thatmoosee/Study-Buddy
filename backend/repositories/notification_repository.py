@@ -1,9 +1,9 @@
 import json
 import os
-from models.notification import Notification
 
-from backend.models import notification
-from backend.repositories.base_repository import BaseRepository
+from models.notification import Notification
+from models import notification
+from repositories.base_repository import BaseRepository
 
 
 class NotificationRepository(BaseRepository):

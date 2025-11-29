@@ -3,8 +3,7 @@ import os
 from sched import scheduler
 
 from models.study_scheduler import StudyScheduler
-
-from backend.repositories.base_repository import BaseRepository
+from repositories.base_repository import BaseRepository
 
 
 class StudySchedulerRepository(BaseRepository):

@@ -55,15 +55,6 @@ chat_service = ChatService(chat_repo)
 
 token_repo = PasswordResetTokenRepository(os.path.join(DATA_DIR, 'password_reset_tokens.json'))
 
-# Initialize email service (will raise error if SENDGRID_API_KEY not set)
-try:
-    email_service = EmailService()
-    auth_service = AuthService(user_repo, token_repo, email_service)
-except ValueError as e:
-    print(f"Warning: Email service not configured - {e}")
-    print("Password reset functionality will not be available")
-    auth_service = AuthService(user_repo)
-
 group_repo = GroupRepository(os.path.join(DATA_DIR, 'groups.json'))
 group_service = GroupService(group_repo)
 
