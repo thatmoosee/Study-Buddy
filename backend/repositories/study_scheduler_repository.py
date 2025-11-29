@@ -1,3 +1,10 @@
+"""
+Study scheduler repository for session management
+
+Built by:
+"""
+
+
 import json
 import os
 from sched import scheduler

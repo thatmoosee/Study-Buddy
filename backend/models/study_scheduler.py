@@ -1,3 +1,9 @@
+"""
+Study scheduler model for managing study sessions
+
+Built by:
+"""
+
 from models.base_model import BaseModel
 
 

@@ -1,3 +1,9 @@
+"""
+Group service for study group operations
+
+Built by: Max Quirk
+"""
+
 from models.group import Group
 
 class GroupService:

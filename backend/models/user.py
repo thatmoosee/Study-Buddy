@@ -1,3 +1,8 @@
+"""
+User model with authentication and account management
+
+Built by:
+"""
 from models.base_model import BaseModel
 import bcrypt
 import re
@@ -48,7 +53,8 @@ class User(BaseModel):
             return bcrypt.checkpw(password.encode(), self._password_hash.encode())
         except (ValueError, AttributeError):
             return False
-    
+        
+    # Validate user data ensuring email is valid .edu address and password exists
     def validate(self):
         """Validate user data"""
         errors = []

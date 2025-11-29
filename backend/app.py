@@ -1,6 +1,10 @@
+"""
+Main Flask application with API routes and endpoints
+
+Built by: Josh Topp, Josh Schmidt, Max Quirk
+"""
 from flask import Flask, request, jsonify, session, send_from_directory
 from services.auth_service import AuthService
-from services.email_service import EmailService
 from repositories.user_repository import UserRepository
 from repositories.group_repository import GroupRepository
 from repositories.notification_repository import NotificationRepository
@@ -17,12 +21,6 @@ from models.group import Group
 import os
 import secrets
 
-# Load environment variables from .env file if it exists
-try:
-    from dotenv import load_dotenv
-    load_dotenv()
-except ImportError:
-    pass  # python-dotenv not installed, environment variables must be set manually
 
 # Compute correct paths
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -42,18 +40,17 @@ app.secret_key = os.environ.get('SECRET_KEY') or secrets.token_hex(32)
 
 # Initialize repositories and services with absolute paths
 user_repo = UserRepository(os.path.join(DATA_DIR, 'users.json'))
+token_repo = PasswordResetTokenRepository(os.path.join(DATA_DIR, 'password_reset_tokens.json'))
 group_repo = GroupRepository(os.path.join(DATA_DIR, 'groups.json'))
 profile_repo = ProfileRepository(os.path.join(DATA_DIR, 'profiles.json'))
 notification_repo = NotificationRepository(os.path.join(DATA_DIR, 'notifications.json'))
 study_scheduler_repo = StudySchedulerRepository(os.path.join(DATA_DIR, 'study_scheduler.json'))
 chat_repo = ChatRepository(os.path.join(DATA_DIR, 'chat.json'))
-auth_service = AuthService(user_repo)
+auth_service = AuthService(user_repo, token_repo)
 profile_service = ProfileService(profile_repo)
 notification_service = NotificationService(notification_repo)
 study_scheduler_service = SchedulerService(study_scheduler_repo)
 chat_service = ChatService(chat_repo)
-
-token_repo = PasswordResetTokenRepository(os.path.join(DATA_DIR, 'password_reset_tokens.json'))
 
 group_repo = GroupRepository(os.path.join(DATA_DIR, 'groups.json'))
 group_service = GroupService(group_repo)
@@ -158,20 +155,28 @@ def forgot_password():
         if not email:
             return jsonify({'success': False, 'error': 'Email is required'}), 400
 
-        # Request password reset (returns None if user doesn't exist for security)
-        auth_service.request_password_reset(email)
+        # Request password reset (returns token or None if user doesn't exist)
+        reset_token = auth_service.request_password_reset(email)
 
-        # Always return success to prevent user enumeration
-        return jsonify({
-            'success': True,
-            'message': 'If an account exists with this email, password reset instructions have been sent.'
-        }), 200
+        # If token was created, return it for in-app display
+        if reset_token:
+            return jsonify({
+                'success': True,
+                'message': 'Password reset token generated successfully.',
+                'token': reset_token.token
+            }), 200
+        else:
+            # User doesn't exist, but return success to prevent user enumeration
+            return jsonify({
+                'success': True,
+                'message': 'If an account exists with this email, a reset token has been generated.'
+            }), 200
     except ValueError as e:
         error_message = str(e)
         # If it's a configuration error, return 503
         if 'not configured' in error_message.lower():
             return jsonify({'success': False, 'error': 'Password reset service is currently unavailable'}), 503
-        # For validation errors or email sending failures, return 400
+        # For validation errors, return 400
         return jsonify({'success': False, 'error': error_message}), 400
     except Exception as e:
         # Catch unexpected errors
@@ -474,6 +479,59 @@ def filter_groups():
         "groups": [group.to_dict() for group in groups]
     })
 
+# FRIEND ROUTES
+
+
+@app.route('/api/friend/remove', methods=['POST'])
+def remove_friend():
+    """Remove a friend"""
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'Not logged in'}), 401
+
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'error': 'Request body is required'}), 400
+    except Exception:
+        return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
+
+    if 'friend_id' not in data:
+        return jsonify({'success': False, 'error': 'Friend ID is required'}), 400
+
+    try:
+        user_id = session['user_id']
+        friend_id = data['friend_id']
+        friend_service.remove_friend(user_id, friend_id)
+        return jsonify({
+            'success': True,
+            'message': 'Friend removed successfully'
+        })
+    except ValueError as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
+
+
+@app.route('/api/friend/add', methods=['POST'])
+def add_friend():
+    """PLACEHOLDER: Add friend endpoint - not yet implemented"""
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'Not logged in'}), 401
+
+    return jsonify({
+        'success': False,
+        'error': 'AddFriend feature not yet implemented'
+    }), 501
+
+
+@app.route('/api/friend/list', methods=['GET'])
+def list_friends():
+    """PLACEHOLDER: Get friends list endpoint - not yet implemented"""
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'Not logged in'}), 401
+
+    return jsonify({
+        'success': False,
+        'error': 'FriendsList feature not yet implemented'
+    }), 501
 
 
 # main entry point

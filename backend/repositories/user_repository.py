@@ -1,3 +1,9 @@
+"""
+User repository for database operations on user accounts
+
+Built by: Max Quirk
+"""
+
 import json
 import os
 from models.user import User

@@ -1,3 +1,9 @@
+"""
+Profile service for user profile business logic
+
+Built by:
+"""
+
 from models.profile import Profile
 from validators.profile_validator import ProfileValidator
 

@@ -1,3 +1,9 @@
+"""
+User profile model for storing student information and availability
+
+Built by: Max Quirk
+"""
+
 from models.base_model import BaseModel
 
 class Profile(BaseModel):

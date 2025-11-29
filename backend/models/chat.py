@@ -1,3 +1,8 @@
+"""
+Chat model for group messaging functionality
+
+Built by:
+"""
 from models.base_model import BaseModel
 
 class Chat(BaseModel):

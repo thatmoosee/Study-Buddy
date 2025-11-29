@@ -1,7 +1,13 @@
+"""
+Password reset token repository for token management
+
+Built by: Max Quirk
+"""
+
 import json
 import os
 from datetime import datetime
-from models.password_reset_token import PasswordResetToken
+from models.password_reset import PasswordResetToken
 from repositories.base_repository import BaseRepository
 
 class PasswordResetTokenRepository(BaseRepository):

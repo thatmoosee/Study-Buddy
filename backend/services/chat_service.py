@@ -1,3 +1,9 @@
+"""
+Chat service for messaging functionality
+
+Built by:
+"""
+
 from models.chat import Chat
 
 

@@ -1,3 +1,9 @@
+"""
+Notification model for user alerts and updates
+
+Built by:
+"""
+
 class Notification:
     def __init__(self, user_id, message, read=False, id=None, created_at=None):
         self.id = id

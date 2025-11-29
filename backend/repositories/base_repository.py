@@ -1,3 +1,9 @@
+"""
+Abstract base repository defining data access interface
+
+Built by: Max Quirk
+"""
+
 from abc import ABC, abstractmethod
 
 class BaseRepository(ABC):

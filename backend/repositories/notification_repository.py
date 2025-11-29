@@ -1,3 +1,9 @@
+"""
+Notification repository for managing user notifications
+
+Built by:
+"""
+
 import json
 import os
 

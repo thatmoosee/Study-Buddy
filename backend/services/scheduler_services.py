@@ -1,3 +1,8 @@
+"""
+Scheduler service for study session management
+
+Built by:
+"""
 from repositories.study_scheduler_repository import StudySchedulerRepository
 from models.study_scheduler import StudyScheduler
 

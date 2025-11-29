@@ -1,3 +1,9 @@
+"""
+Group repository for study group data persistence
+
+Built by: Max Quirk
+"""
+
 import json
 import os
 from models.group import Group

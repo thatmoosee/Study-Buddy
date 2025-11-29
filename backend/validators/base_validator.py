@@ -1,3 +1,8 @@
+"""
+Base validator providing validation utilities
+
+Built by: Max Quirk
+"""
 from abc import ABC, abstractmethod
 
 class BaseValidator(ABC):

@@ -1,3 +1,9 @@
+"""
+Study group model for collaborative learning sessions
+
+Built by: Max Quirk
+"""
+
 from models.base_model import BaseModel
 import uuid
 
@@ -69,6 +75,7 @@ class Group(BaseModel):
         return True
 
     def to_dict(self):
+        """ Convert group to dictionary for API responses and JSON storage """
         return {
             'id': self.id,
             'name': self._name,

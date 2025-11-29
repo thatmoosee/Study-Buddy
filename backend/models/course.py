@@ -1,3 +1,8 @@
+"""
+Course model representing academic classes
+
+Built by:
+"""
 from models.base_model import BaseModel
 
 class Course(BaseModel):

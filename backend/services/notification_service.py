@@ -1,3 +1,9 @@
+"""
+Notification service for user alert management
+
+Built by:
+"""
+
 from models.notification import Notification
 
 class NotificationService:

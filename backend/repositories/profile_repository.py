@@ -1,3 +1,9 @@
+"""
+Profile repository for storing and retrieving user profiles
+
+Built by: Max Quirk
+"""
+
 import json
 import os
 from models.profile import Profile

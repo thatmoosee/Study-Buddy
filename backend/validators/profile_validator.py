@@ -1,3 +1,8 @@
+"""
+Profile data validator for user profiles
+
+Built by: Max Quirk
+"""
 from validators.base_validator import BaseValidator
 
 class ProfileValidator(BaseValidator):

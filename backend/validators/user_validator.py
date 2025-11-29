@@ -1,3 +1,8 @@
+"""
+User data validator for account information
+
+Built by: Max Quirk
+"""
 from validators.base_validator import BaseValidator
 import re
 
