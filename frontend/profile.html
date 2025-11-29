@@ -12,10 +12,6 @@
 
     <main style="text-align:center;">
 
-        <a href="profile.html">
-            <img id="profile" src="img/profile.png">
-        </a>
-
         <h1>Profile</h1>
 
         <h3 id="userEmail">Loading user...</h3>
@@ -24,19 +20,14 @@
 
         <hr>
 
-        <!-- GROUP MANAGEMENT -->
         <section>
-            <h2>Groups</h2>
-            <ul id="groupList"></ul>
-            <input id="newGroupName" placeholder="Group Name">
+            <h2>Friends</h2>
+            <ul id="friendList"></ul>
+            <hr>
+            <input id="newFriend" placeholder="Friends ID">
             <br>
-            <button id="createGroupBtn">Create</button>
-            <button id="joinGroupBtn">Join</button>
-            <button id="leaveGroupBtn">Leave</button>
-
-            <p id="joinGroupError" class="err"></p>
-            <p id="leaveGroupError" class="err"></p>
-            <p id="createGroupError" class="err"></p>
+            <button id="addFriendBtn">Add Friend</button>
+            <button id="removeFriendBtn">Remove Friend</button>
         </section>
 
         <footer></footer>

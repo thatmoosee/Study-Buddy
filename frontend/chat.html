@@ -1,0 +1,50 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Study Buddy</title>
+    <link rel="icon" type="image/x-icon" href="img/icon.png">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/profile.css">
+</head>
+
+<body>
+    <div id="header-placeholder"></div>
+
+    <main style="text-align:center;">
+
+       <section>
+           <h2>Your Chats</h2>
+           <hr>
+           <ul id="allChats"></ul>
+           <br>
+           <input id="newChat" placeholder="Chat ID">
+           <br>
+           <button id="createChatBtn">Create</button>
+           <button id="joinChatBtn">Join</button>
+           <button id="leaveChatBtn">Leave</button>
+
+       </section>
+
+       <div id="chatPopup" class="popup">
+           <div class="popup-content">
+            <h3 id="chatPopupTitle"></h3>
+
+                <p><strong>Members:</strong> <span id="chatPopupMembers"></span></p>
+
+                <div id="chatMessages"
+                     style="height:200px; overflow-y:auto; border:1px solid #ccc; padding:5px; margin-bottom:10px;">
+                </div>
+
+                <input id="chatMessageInput" placeholder="Type message..." style="width:70%;">
+                <button id="sendChatMessageBtn">Send</button>
+                <button id="closeChatPopupBtn">Close</button>
+           </div>
+       </div>
+
+    </main>
+
+    <script src="js/header.js"></script>
+    <script src="js/chat.js"></script>
+</body>
+</html>

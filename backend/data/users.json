@@ -10,5 +10,11 @@
         "email": "jatopp@ilstu.edu",
         "_password_hash": "$2b$12$baH6AdHNkwRBji56P567veadTQP6DG4sCP3IqGD8Hxk55B1YyCPgm",
         "_is_active": true
+    },
+    "3": {
+        "id": 3,
+        "email": "jatopp2@ilstu.edu",
+        "_password_hash": "$2b$12$0JgG9nlPzibSgJkGH4TcduhqwSBqnjT2CuPyo.I7Nm4QVDQjxW3hS",
+        "_is_active": true
     }
 }

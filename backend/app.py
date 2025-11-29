@@ -404,26 +404,45 @@ def create_study_schedule():
     except ValueError as e:
         return jsonify({'success': False, 'error': str(e)}), 400
 
+@app.route("/api/chat/join", methods=['POST'])
+def join_chat():
+    data = request.get_json() or {}
+    chat_id = int(data.get('chat_id'))
+    user_id = session['user_id']
+    print(chat_id, user_id)
+    if not chat_id or not user_id:
+        return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
+
+    chat = chat_service.join_chat(chat_id, user_id)
+    print(chat)
+    return jsonify({
+        'success': True,
+        'message': f'Chat joined successfully!',
+        'chat': chat.to_dict()
+    })
+
+
 @app.route('/api/chat/create', methods=['POST'])
 def create_chat():
     data =request.get_json() or {}
     name = data.get('name')
-    owner_id = data.get('owner_id')
-    members = data.get('members', [])
-
-    if not name or not owner_id:
+    user_id = session['user_id']
+    print(name, user_id)
+    if not name or not user_id:
         return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
-    chat = chat_service.create_chat(name, owner_id , members)
+    chat = chat_service.create_chat(name, user_id)
     return jsonify({
         'success': True,
         'message': f'Chat created successfully!',
         'study': chat.to_dict()
     })
 
-@app.route('/api/chat/join', methods=['POST'])
-def send_message(chat_id):
+@app.route('/api/chat/send', methods=['POST'])
+def send_message():
     data = request.get_json() or {}
+    chat_id = int(data.get('chat_id'))
     message = data.get('message')
+    print(chat_id, message)
     if not chat_id:
         return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
 
@@ -434,27 +453,27 @@ def send_message(chat_id):
         'study': chat.to_dict()
     })
 
-@app.route('/api/chat/receive', methods=['POST'])
+@app.route('/api/chat/get', methods=['POST'])
 def get_chat(chat_id):
-    chat = chat_repo.get(chat_id)
-    if not chat:
+    chat_id = int(chat_repo.get(chat_id))
+    if not chat_id:
         return jsonify({'success': False, 'error': 'Chat not found'}), 404
 
     return jsonify({
         'success': True,
         'message': f'Chat received successfully!',
-        'study': chat.to_dict()
+        'study': chat_id.to_dict()
     })
 
 @app.route('/api/chat/leave', methods=['POST'])
-def leave_chat(chat_id):
+def leave_chat():
     data = request.get_json() or {}
-    user_id = data.get('user_id')
-
+    user_id = session['user_id']
+    chat_id = int(data.get('chat_id'))
     if not chat_id:
         return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
 
-    chat = chat_service.leave_chat(user_id, chat_id)
+    chat = chat_service.leave_chat(chat_id, user_id)
     return jsonify({
         'success': True,
         'message': f'Chat leaved successfully!',
@@ -481,6 +500,64 @@ def filter_groups():
         'success': True,
         'message': f'Groups filtered successfully!',
         "groups": [group.to_dict() for group in groups]
+    })
+
+@app.route('/api/chat/listallchats', methods=['GET'])
+def list_all_user_chats():
+    user_id = session['user_id']
+    if not user_id:
+        return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
+    user_chats = chat_service.list_all_chats(user_id)
+    print(user_chats)
+    return jsonify({
+        'success': True,
+        'message': f'Chat listed successfully!',
+        'chats': user_chats
+    })
+
+@app.route('/api/friends/list', methods=['GET'])
+def get_friends():
+    print("hello")
+    user_id = session['user_id']
+    print(user_id)
+    friends = profile_service.list_friends(user_id)
+    return jsonify({
+        'success': True,
+        'message': f'Friends listed successfully!',
+        'friends': friends
+    })
+
+
+
+@app.route("/api/friends/add", methods=['POST'])
+def add_friends():
+    data = request.get_json() or {}
+    friend_id = data.get('friend_id')
+    user_id = session['user_id']
+
+    if not user_id:
+        return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
+
+    profile = profile_service.add_friend(user_id, friend_id)
+    return jsonify({
+        'success': True,
+        'message': f'Friends added successfully!',
+        'profile': profile.to_dict()
+    })
+
+@app.route("/api/friends/remove", methods=['POST'])
+def remove_friends():
+    data = request.get_json() or {}
+    friend_id = data.get('friend_id')
+    user_id = session['user_id']
+    if not user_id:
+        return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
+
+    profile = profile_service.remove_friend(user_id, friend_id)
+    return jsonify({
+        'success': True,
+        'message': f'Friends removed successfully!',
+        'profile': profile.to_dict()
     })
 
 

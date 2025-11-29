@@ -1,6 +1,4 @@
-/******************************************
- * login is required if not — redirect to index.html
- ******************************************/
+
 async function checkAuth() {
     const res = await fetch("/api/auth/status");
     const data = await res.json();
@@ -14,32 +12,22 @@ async function checkAuth() {
         "Logged in as: " + data.user.email;
 }
 
-/******************************************
- * this pulls the users group the /api/group/list endpoint in app.py
- ******************************************/
-async function loadGroups() {
-    const res = await fetch("/api/group/list");
+async function loadFriends() {
+    const res = await fetch("/api/friends/list");
     if (!res.ok) return;
 
     const data = await res.json();
-    const list = document.getElementById("groupList");
+    const list = document.getElementById("friendList");
     list.innerHTML = "";
 
-    if (data.groups.length === 0) {
-        list.innerHTML = "<p>You are not in any groups.</p>";
+    if (data.friends.length === 0 || !data.friends) {
+        list.innerHTML = "<p>You have no friends yet.</p>";
         return;
     }
 
-    data.groups.forEach(g => {
+    data.groups.forEach(id => {
         const li = document.createElement("li");
-        li.className = "group-item";
-        li.textContent = `${g.name}`;
-
-        li.style.cursor = "pointer";
-        li.addEventListener("click", () => {
-            openGroupInfo(g);
-        });
-
+        li.textContent =  id;
         list.appendChild(li);
     });
 }
@@ -54,85 +42,54 @@ document.getElementById("editProfileBtn").addEventListener("click", () => {
 });
 
 /*
- create group pulls it from app.py api/group/create
-*/
-document.getElementById("createGroupBtn").addEventListener("click", async () => {
-    const name = document.getElementById("newGroupName").value.trim();
-    const err = document.getElementById("createGroupError");
-
-    err.textContent = "";
-    if (!name) {
-        err.textContent = "Group name required.";
-        return;
-    }
-
-    const res = await fetch("/api/group/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, members: [] })
-    });
-
-    const data = await res.json();
-    if (!data.success) {
-        err.textContent = data.error;
-    } else {
-        loadGroups();
-    }
-});
-
-/*
 Join a group
 */
-document.getElementById("joinGroupBtn").addEventListener("click", async () => {
-    const id = document.getElementById("newGroupName").value.trim();
-    const err = document.getElementById("joinGroupError");
-    err.textContent = "";
+document.getElementById("addFriendBtn").addEventListener("click", async () => {
+    const id = document.getElementById("newFriend").value.trim();
 
     if (!id) {
-        err.textContent = "Group ID required.";
+        err.textContent = "Friend ID required.";
         return;
     }
 
-    const res = await fetch("/api/group/join", {
+    const res = await fetch("/api/friends/add", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ group_id: id })
+        body: JSON.stringify({ friend_id: id })
     });
 
     const data = await res.json();
     if (!data.success) {
         err.textContent = data.error;
     } else {
-        loadGroups();
+        loadFriends();
     }
 });
 
 /*
 Leave a group
 */
-document.getElementById("leaveGroupBtn").addEventListener("click", async () => {
-    const id = document.getElementById("newGroupName").value.trim();
-    const err = document.getElementById("leaveGroupError");
-    err.textContent = "";
+document.getElementById("removeFriendBtn").addEventListener("click", async () => {
+    const id = document.getElementById("newFriend").value.trim();
 
     if (!id) {
-        err.textContent = "Group ID required.";
+        err.textContent = "Friend ID required.";
         return;
     }
 
-    const res = await fetch("/api/group/leave", {
+    const res = await fetch("/api/friends/remove", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ group_id: id })
+        body: JSON.stringify({ friend_id: id })
     });
 
     const data = await res.json();
     if (!data.success) {
         err.textContent = data.error;
     } else {
-        loadGroups();
+        loadFriends();
     }
 });
 
 checkAuth();
-loadGroups();
+loadFriends();

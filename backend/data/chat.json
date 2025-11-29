@@ -1,3 +1,19 @@
 {
-
+    "1": {
+        "chat_id": 1,
+        "name": "Test",
+        "messages": [
+            "hello",
+            "hello",
+            "test",
+            "hello",
+            "w",
+            "w",
+            "w"
+        ],
+        "members": [
+            2,
+            3
+        ]
+    }
 }

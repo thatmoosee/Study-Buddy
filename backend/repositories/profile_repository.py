@@ -48,6 +48,7 @@ class ProfileRepository(BaseRepository):
             'name': profile.name,
             'major': profile.major,
             'availability': profile.availability,
+            'friends': profile.friends,
             'preferences': profile.preferences
         } for profile in self._storage.values()}
 
@@ -107,6 +108,9 @@ class ProfileRepository(BaseRepository):
 
         if 'preferences' in updated_data:
             profile.preferences = updated_data['preferences']
+
+        if 'friends' in updated_data:
+            profile._friends = updated_data['friends']
 
         self._save_to_file()
         return profile

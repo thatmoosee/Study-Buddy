@@ -41,3 +41,37 @@ class ProfileService:
 
         profile = Profile(user_id=user_id, name=data.get('name'), major=data.get('major'), availability=data.get('availability'))
         return self._profile_repository.create(profile)
+
+    def add_friend(self, user_id, friend_id):
+        profile = self._profile_repository.find_by_user_id(user_id)
+        if not profile:
+            raise KeyError("Profile not found.")
+
+        if "friends" not in profile.friends:
+            profile.friends = []
+
+        if friend_id in profile.friends:
+            raise ValueError("You are already a friend.")
+
+        profile.friends.append(friend_id)
+        self._profile_repository.update(profile.id, profile)
+        return profile
+
+    def remove_friend(self, user_id, friend_id):
+        profile = self._profile_repository.find_by_user_id(user_id)
+        if not profile:
+            raise KeyError("Profile not found.")
+
+        if "friends" not in profile or friend_id not in profile["friends"]:
+            raise ValueError("Friend not found.")
+
+        profile.friends.remove(friend_id)
+        self._profile_repository.update(user_id, profile)
+        return profile
+
+    def list_friends(self, user_id):
+        profile = self._profile_repository.find_by_user_id(user_id)
+        print(profile)
+        if not profile:
+            raise KeyError("Profile not found.")
+        return profile.friends
