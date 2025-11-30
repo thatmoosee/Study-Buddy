@@ -72,8 +72,6 @@ async function loadSessions(){
 
 document.getElementById("scheduleSession").addEventListener("click", async () => {
     const popup = document.getElementById("studySessionPopup");
-    //const id = popup.getAttribute('group_id').trim();
-    //if(!id) return;
     const groupInfoPopup = document.getElementById("groupInfoPopup");
     groupInfoPopup.style.display = "none";
     popup.style.display = "flex";
@@ -262,8 +260,8 @@ async function openGroupInfo(group) {
     const joinButton = document.getElementById('joinGroupBtn');
     const leaveButton = document.getElementById('leaveGroupBtn');
     const scheduleSessionButton = document.getElementById('scheduleSession');
-    const user_id = document.body.getAttribute('user_id');
-    const isMember = group.members.includes(2);
+    const user_id = +document.body.getAttribute('user_id');
+    const isMember = group.members.includes(user_id);
     if(isMember){
         scheduleSessionButton.style.display="flex";
         joinButton.style.display = "none";
