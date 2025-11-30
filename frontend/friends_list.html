@@ -25,22 +25,27 @@
        <a href="profile.html"><img id="profile" src="img/profile.png"></a>
             <p>
                 Max Quirk
+                <button class="remove-friend-btn" data-friend-id="1">Remove</button>
             </p>
 
             <p>
                 Josh Topp
+                <button class="remove-friend-btn" data-friend-id="2">Remove</button>
             </p>
 
              <p>
                 Josh Schmidt
+                <button class="remove-friend-btn" data-friend-id="3">Remove</button>
             </p>
 
             <p>
                 Jamie Morrone
+                <button class="remove-friend-btn" data-friend-id="4">Remove</button>
             </p>
 
             <p>
                 David Lewis
+                <button class="remove-friend-btn" data-friend-id="5">Remove</button>
             </p>
         
         <form id="AddFriendForm">
@@ -53,13 +58,43 @@
             
         </div>
     </main>
+
+    
             
         </div>
     </main>
     <footer></footer>
 
     <script>
-        
+    document.addEventListener("DOMContentLoaded", () => {
+        const userId = sessionStorage.getItem("user_id");
+
+        const removeButtons = document.querySelectorAll(".remove-friend-btn");
+
+        removeButtons.forEach(button => {
+            button.addEventListener("click", async () => {
+                const friendId = button.dataset.friendId;
+
+                const response = await fetch("http://localhost:5000/remove_friend", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        user_id: userId,
+                        friend_id: friendId
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert("Friend removed!");
+                    location.reload();
+                } else {
+                    alert("Error: " + data.message);
+                }
+            });
+        });
+    });
     </script>
 </body>
 </html>
