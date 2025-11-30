@@ -50,7 +50,7 @@ notification_repo = NotificationRepository(os.path.join(DATA_DIR, 'notifications
 study_scheduler_repo = StudySchedulerRepository(os.path.join(DATA_DIR, 'study_scheduler.json'))
 chat_repo = ChatRepository(os.path.join(DATA_DIR, 'chat.json'))
 auth_service = AuthService(user_repo, token_repo)
-friend_service = FriendService(friend_repo)
+friend_service = FriendService(friend_repo,user_repo)
 profile_service = ProfileService(profile_repo)
 notification_service = NotificationService(notification_repo)
 study_scheduler_service = SchedulerService(study_scheduler_repo)
@@ -557,54 +557,52 @@ def remove_friend():
 
 @app.route('/api/friend/add', methods=['POST'])
 def add_friend():
-    """PLACEHOLDER: Add friend endpoint - not yet implemented"""
+    """Add a friend"""
     if 'user_id' not in session:
         return jsonify({'success': False, 'error': 'Not logged in'}), 401
 
-    return jsonify({
-        'success': False,
-        'error': 'AddFriend feature not yet implemented'
-    }), 501
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'error': 'Request body is required'}), 400
+    except Exception:
+        return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
+
+    if 'friend_id' not in data:
+        return jsonify({'success': False, 'error': 'Friend ID is required'}), 400
+
+    try:
+        user_id = session['user_id']
+        friend_id = data['friend_id']
+        success, message = friend_service.add_friend(user_id, friend_id)
+
+        if success:
+            return jsonify({
+                'success': True,
+                'message': message
+            })
+        else:
+            return jsonify({'success': False, 'error': message}), 400
+    except ValueError as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
 
 
 @app.route('/api/friend/list', methods=['GET'])
 def list_friends():
-    """PLACEHOLDER: Get friends list endpoint - not yet implemented"""
+    """Get list of friends for the logged-in user"""
     if 'user_id' not in session:
         return jsonify({'success': False, 'error': 'Not logged in'}), 401
 
-    return jsonify({
-        'success': False,
-        'error': 'FriendsList feature not yet implemented'
-    }), 501
-
-
-# main entry point
-
-@app.route('/api/friends/add', methods=['POST'])
-def add_friend():
-    data = request.get_json()
-    user = data.get("user")
-    friend = data.get("friend")
-
-    success, message = friend_service.add_friend(user, friend)
-
-    return jsonify({
-        "success": success,
-        "message": message
-    }), (200 if success else 400)
-
-@app.route("/remove_friend", methods=["POST"])
-def remove_friend():
-    data = request.get_json()
-    user_id = data.get("user")
-    friend_id = data.get("friend")
-
     try:
-        success = friend_service.remove_friend(user_id, friend_id)
-        return jsonify({"success": success})
-    except ValueError as e:
-        return jsonify({"success": False, "message": str(e)}), 400
+        user_id = session['user_id']
+        friends_list = friend_service.get_friends_list(user_id)
+        return jsonify({
+            'success': True,
+            'friends': friends_list
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
+
 
 @app.route("/students/search", methods=["GET"])
 def search_student():

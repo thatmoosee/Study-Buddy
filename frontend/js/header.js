@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <li><a href="search.html">Search</a></li>
                 <li><a href="chat.html">Chats</a></li>
                 <li><a href="add_notifications.html">Notifications</a></li>
+                <li><a href="friends_list.html">Friends List</a></li>
                 <li><a href="logout.html">Logout</a></li>
             </ul>
         </nav>

@@ -1,25 +1,13 @@
 <!DOCTYPE html>
-
 <html>
     <head>
-        <title>Study Buddy</title>  
+        <title>Study Buddy - Friends List</title>
         <link rel="icon" type="image/x-icon" href="img/icon.png">
         <link rel="stylesheet" href="css/style.css">
     </head>
     <body>
-        <header>
-            <h1>Study Buddy</h1>
-            <navbar>
-                <ul>
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="search.html">Search</a></li>
-                    <li><a href="filter_by_class.html">Filter by Class</a></li>
-                    <li><a href="filter_free_time.html">Filter by Free Time</a></li>
-                    <li><a href="chats.html">Chats</a></li>
-                    <li><a href="friends_list.html">Friends List</a></li>
-                </ul>
-            </navbar>
-            </header>
+        <div id="header-placeholder"></div>
+        <script src="js/header.js"></script>
     <main>
         <h2>Your Friends List</h2>
        <a href="profile.html"><img id="profile" src="img/profile.png"></a>
@@ -55,31 +43,23 @@
         </form>
 
         <div id="results">
-            
-        </div>
-    </main>
 
-    
-            
         </div>
     </main>
     <footer></footer>
 
     <script>
     document.addEventListener("DOMContentLoaded", () => {
-        const userId = sessionStorage.getItem("user_id");
-
         const removeButtons = document.querySelectorAll(".remove-friend-btn");
 
         removeButtons.forEach(button => {
             button.addEventListener("click", async () => {
                 const friendId = button.dataset.friendId;
 
-                const response = await fetch("http://localhost:5000/remove_friend", {
+                const response = await fetch("/api/friend/remove", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        user_id: userId,
                         friend_id: friendId
                     })
                 });
@@ -87,10 +67,10 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    alert("Friend removed!");
+                    alert("Friend removed successfully!");
                     location.reload();
                 } else {
-                    alert("Error: " + data.message);
+                    alert("Error: " + (data.error || data.message));
                 }
             });
         });

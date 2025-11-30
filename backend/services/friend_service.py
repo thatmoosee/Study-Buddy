@@ -28,14 +28,32 @@ class FriendService:
         return True
 
     def add_friend(self, user_id, friend_id):
+        """
+        Add a friend relationship between two users.
+        Returns (success: bool, message: str)
+        """
+        # Check if users exist
         user = self.user_repo.find_by_id(user_id)
         friend_user = self.user_repo.find_by_id(friend_id)
 
-        if user is None or friend_user is None:
+        if user is None:
             return False, "User not found"
 
+        if friend_user is None:
+            return False, "Friend user not found"
+
+        # Check if trying to add self as friend
+        if user_id == friend_id:
+            return False, "Cannot add yourself as a friend"
+
+        # Check if friendship already exists
+        existing = self.friend_repo.find_friendship(user_id, friend_id)
+        if existing:
+            return False, "Already friends with this user"
+
+        # Create the friendship
         self.friend_repo.add_friend(user_id, friend_id)
-        return True, "Friend added"
+        return True, "Friend added successfully"
 
     def get_friends_list(self, user_id):
         return self.friend_repo.get_friends_list(user_id)
