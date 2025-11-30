@@ -255,10 +255,10 @@ def leave_group():
 @app.route('/api/friends/add', methods=['POST'])
 def add_friend():
     data = request.get_json()
-    requester = data.get("requester")
+    user = data.get("user")
     friend = data.get("friend")
 
-    success, message = friend_service.add_friend(requester, friend)
+    success, message = friend_service.add_friend(user, friend)
 
     return jsonify({
         "success": success,
@@ -268,12 +268,14 @@ def add_friend():
 @app.route("/remove_friend", methods=["POST"])
 def remove_friend():
     data = request.get_json()
-    requester = data.get("requester")
-    friend = data.get("friend")
+    user_id = data.get("user")
+    friend_id = data.get("friend")
 
-    success, message = friend_service.remove_friend(requester, friend)
-
-    return jsonify({"success": success, "message": message})
+    try:
+        success = friend_service.remove_friend(user_id, friend_id)
+        return jsonify({"success": success})
+    except ValueError as e:
+        return jsonify({"success": False, "message": str(e)}), 400
 
 if __name__ == '__main__':
     print("Study Buddy running on http://localhost:5000")
