@@ -265,6 +265,16 @@ def add_friend():
         "message": message
     }), (200 if success else 400)
 
+@app.route("/remove_friend", methods=["POST"])
+def remove_friend():
+    data = request.get_json()
+    requester = data.get("requester")
+    friend = data.get("friend")
+
+    success, message = friend_service.remove_friend(requester, friend)
+
+    return jsonify({"success": success, "message": message})
+
 if __name__ == '__main__':
     print("Study Buddy running on http://localhost:5000")
     app.run(debug=True, host='0.0.0.0', port=5000)

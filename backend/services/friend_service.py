@@ -20,3 +20,20 @@ class FriendService:
 
     def get_friends(self, email):
         return self.friend_repo.get_friends(email)
+    
+    def remove_friend(self, requester_email, friend_email):
+        requester = requester_email.lower().strip()
+        friend = friend_email.lower().strip()
+
+        user = self.user_repo.find_by_email(requester)
+        friend_user = self.user_repo.find_by_email(friend)
+
+        if user is None or friend_user is None:
+            return False, "User not found"
+
+        removed = self.friend_repo.remove_friend(requester, friend)
+
+        if not removed:
+            return False, "Friend not found in list"
+
+        return True, "Friend removed"
