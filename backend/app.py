@@ -273,13 +273,14 @@ def join_group():
     except Exception:
         return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
 
-    if 'group_id' not in data:
-        return jsonify({'success': False, 'error': 'Group ID is required'}), 400
+    # Accept either group_id or group_name
+    group_identifier = data.get('group_id') or data.get('group_name')
+    if not group_identifier:
+        return jsonify({'success': False, 'error': 'Group ID or name is required'}), 400
 
     try:
         user_id = session['user_id']
-        group_id = data['group_id']
-        updated_group = group_service.join_group(user_id, group_id)
+        updated_group = group_service.join_group(user_id, group_identifier)
         return jsonify({
             'success': True,
             'message': f'Group {updated_group.name} joined successfully!',
@@ -301,13 +302,14 @@ def leave_group():
     except Exception:
         return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
 
-    if 'group_id' not in data:
-        return jsonify({'success': False, 'error': 'Group ID is required'}), 400
+    # Accept either group_id or group_name
+    group_identifier = data.get('group_id') or data.get('group_name')
+    if not group_identifier:
+        return jsonify({'success': False, 'error': 'Group ID or name is required'}), 400
 
     try:
         user_id = session['user_id']
-        group_id = data['group_id']
-        updated_group = group_service.leave_group(user_id, group_id)
+        updated_group = group_service.leave_group(user_id, group_identifier)
         return jsonify({
             'success': True,
             'message': f'You have left {updated_group.name}.',

@@ -4,10 +4,11 @@
         "name": "group1",
         "owner_id": 2,
         "members": [
-            2
+            2,
+            1
         ],
         "study_times": [],
-        "specified_class": []
+        "specified_class": ""
     },
     "6755bcd1bc5641208df14027b0e999b2": {
         "id": "6755bcd1bc5641208df14027b0e999b2",
@@ -17,7 +18,7 @@
             2
         ],
         "study_times": [],
-        "specified_class": []
+        "specified_class": ""
     },
     "4b454bc97d354c7f8c4eadf825f2cd27": {
         "id": "4b454bc97d354c7f8c4eadf825f2cd27",
@@ -27,7 +28,7 @@
             2
         ],
         "study_times": [],
-        "specified_class": []
+        "specified_class": ""
     },
     "2f22ab261d704c009d5edea4f241981d": {
         "id": "2f22ab261d704c009d5edea4f241981d",

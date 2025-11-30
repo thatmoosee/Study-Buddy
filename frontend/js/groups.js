@@ -196,16 +196,80 @@ createConfirmBtn.addEventListener("click", async () => {
         })
     });
 
+    const data = await res.json();
+
     if (!res.ok) {
-        alert("Failed to create group.");
+        alert(data.error || "Failed to create group.");
         return;
     }
 
+    alert(data.message);
     createPopup.style.display = "none";
     groupNameInput.value = "";
     loadGroups();
     loadAllGroups();
 });
+
+// Join group functionality
+const joinBtn = document.getElementById("joinGroupBtn");
+joinBtn.addEventListener("click", async () => {
+    const groupName = groupNameInput.value.trim();
+    if (!groupName) {
+        document.getElementById("joinGroupError").textContent = "Please enter a group name to join.";
+        return;
+    }
+    document.getElementById("joinGroupError").textContent = "";
+
+    const res = await fetch("/api/group/join", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ group_name: groupName })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+        document.getElementById("joinGroupError").textContent = data.error || "Failed to join group.";
+        return;
+    }
+
+    alert(data.message);
+    groupNameInput.value = "";
+    document.getElementById("joinGroupError").textContent = "";
+    loadGroups();
+    loadAllGroups();
+});
+
+// Leave group functionality
+const leaveBtn = document.getElementById("leaveGroupBtn");
+leaveBtn.addEventListener("click", async () => {
+    const groupName = groupNameInput.value.trim();
+    if (!groupName) {
+        document.getElementById("leaveGroupError").textContent = "Please enter a group name to leave.";
+        return;
+    }
+    document.getElementById("leaveGroupError").textContent = "";
+
+    const res = await fetch("/api/group/leave", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ group_name: groupName })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+        document.getElementById("leaveGroupError").textContent = data.error || "Failed to leave group.";
+        return;
+    }
+
+    alert(data.message);
+    groupNameInput.value = "";
+    document.getElementById("leaveGroupError").textContent = "";
+    loadGroups();
+    loadAllGroups();
+});
+
 checkAuth();
 loadGroups();
 loadAllGroups();

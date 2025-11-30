@@ -31,17 +31,27 @@ class Group(BaseModel):
     def owner_id(self):
         return self._owner_id
     
+    @property
     def rating(self):
-        return self.rating
-    
+        return self._rating if hasattr(self, '_rating') else 0
+
     def setRating(self, rate):
-        self.rating = rate
+        self._rating = rate
 
+    @property
     def specified_class(self):
-        return self._specified_class
+        # Handle both string and array formats for backward compatibility
+        if not self._specified_class or self._specified_class == []:
+            return ""
+        # If it's a list, join it; otherwise return as string
+        return ", ".join(self._specified_class) if isinstance(self._specified_class, list) else self._specified_class
 
+    @property
     def study_times(self):
-        return self._study_times
+        # Ensure it's always an array
+        if not self._study_times:
+            return []
+        return self._study_times if isinstance(self._study_times, list) else [self._study_times]
 
     @property
     def members(self):
@@ -78,11 +88,11 @@ class Group(BaseModel):
         """ Convert group to dictionary for API responses and JSON storage """
         return {
             'id': self.id,
-            'name': self._name,
-            'owner_id': self._owner_id,
-            'members': self._members,
-            'study_times': self._study_times,
-            'specified_class': self._specified_class
+            'name': self.name,
+            'owner_id': self.owner_id,
+            'members': self.members,
+            'study_times': self.study_times,
+            'specified_class': self.specified_class
         }
 
     def validate(self):

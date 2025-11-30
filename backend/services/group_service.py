@@ -14,14 +14,23 @@ class GroupService:
         
     def create_group(self, name, owner_id, members=None, class_name=None, study_times=None):
         """Create a new group"""
+        # Check for duplicate group name
+        existing_group = self.group_repo.find_by_name(name)
+        if existing_group:
+            raise ValueError(f"A group with the name '{name}' already exists")
+
         # Group constructor already adds owner to members, no need to do it again
         group = Group(name, owner_id, members, class_name, study_times)
         self.group_repo.add(group)
         return group
 
-    def join_group(self, user_id, group_id):
-        """Add a user to a group"""
-        group = self.group_repo.get(group_id)
+    def join_group(self, user_id, group_identifier):
+        """Add a user to a group by ID or name"""
+        # Try to find by ID first, then by name
+        group = self.group_repo.get(group_identifier)
+        if not group:
+            group = self.group_repo.find_by_name(group_identifier)
+
         if not group:
             raise ValueError("Group not found")
 
@@ -29,12 +38,16 @@ class GroupService:
             raise ValueError("User already in the group")
 
         group.add_member(user_id)
-        self.group_repo.update(group_id, group)
+        self.group_repo.update(group.id, group)
         return group
-        
-    def leave_group(self, user_id, group_id):
-        """Remove a user from a group"""
-        group = self.group_repo.get(group_id)
+
+    def leave_group(self, user_id, group_identifier):
+        """Remove a user from a group by ID or name"""
+        # Try to find by ID first, then by name
+        group = self.group_repo.get(group_identifier)
+        if not group:
+            group = self.group_repo.find_by_name(group_identifier)
+
         if not group:
             raise ValueError("Group not found")
 
@@ -45,9 +58,9 @@ class GroupService:
 
         # Clean up orphan groups - delete if no members remain
         if len(group._members) == 0:
-            self.group_repo.remove(group_id)
+            self.group_repo.remove(group.id)
         else:
-            self.group_repo.update(group_id, group)
+            self.group_repo.update(group.id, group)
 
         return group
 

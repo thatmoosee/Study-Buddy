@@ -108,15 +108,22 @@ class GroupRepository(BaseRepository):
         self._storage[group.id] = group
         self._save_data()
 
+    def find_by_name(self, name):
+        """Find group by name (case-insensitive)"""
+        for group in self._storage.values():
+            if group.name.lower() == name.lower():
+                return group
+        return None
+
     def filter_by(self, specified_class=None, study_times=None):
         """Filter groups by specific class"""
         groups = []
         for group in self._storage.values():
             if specified_class is not None:
-                if specified_class not in group.specified_class():
+                if specified_class not in group.specified_class:
                     continue
             if study_times is not None:
-                if study_times not in group.study_times():
+                if study_times not in group.study_times:
                     continue
 
             groups.append(group)
