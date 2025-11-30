@@ -604,6 +604,18 @@ def remove_friend():
     except ValueError as e:
         return jsonify({"success": False, "message": str(e)}), 400
 
+@app.route("/students/search", methods=["GET"])
+def search_student():
+    email = request.args.get("email", "").strip().lower()
+    if not email:
+        return jsonify({"error": "Email parameter required"}), 400
+
+    user = user_repo.find_by_email(email)
+    if user:
+        return jsonify({"found": True, "student": user}), 200
+    else:
+        return jsonify({"found": False, "message": "Student not found"}), 404
+
 if __name__ == '__main__':
     print("Study Buddy running at http://localhost:5000")
     # Only enable debug mode in development, and don't expose to all interfaces
