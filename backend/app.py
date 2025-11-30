@@ -47,7 +47,7 @@ group_repo = GroupRepository(os.path.join(DATA_DIR, 'groups.json'))
 profile_repo = ProfileRepository(os.path.join(DATA_DIR, 'profiles.json'))
 friend_repo = FriendRepository(os.path.join(DATA_DIR, 'friends.json'))
 notification_repo = NotificationRepository(os.path.join(DATA_DIR, 'notifications.json'))
-study_scheduler_repo = StudySchedulerRepository(os.path.join(DATA_DIR, 'study_scheduler.json'))
+study_scheduler_repo = StudySchedulerRepository(os.path.join(DATA_DIR, 'schedule.json'))
 chat_repo = ChatRepository(os.path.join(DATA_DIR, 'chat.json'))
 auth_service = AuthService(user_repo, token_repo)
 friend_service = FriendService(friend_repo)
@@ -245,13 +245,15 @@ def create_group():
 
     name = data.get('name')
     members = data.get('members', [])
+    study_times = data.get('study_times', [])
+    specified_class = data.get('specified_class', None)
 
     if not name:
         return jsonify({'success': False, 'error': 'Group name is required'}), 400
 
     try:
         owner_id = session['user_id']
-        group = group_service.create_group(name, owner_id, members)
+        group = group_service.create_group(name, owner_id, members, study_times, specified_class)
         return jsonify({
             'success': True,
             'message': f'Group {group.name} created successfully!',
@@ -280,6 +282,12 @@ def join_group():
         user_id = session['user_id']
         group_id = data['group_id']
         updated_group = group_service.join_group(user_id, group_id)
+        for member in group_service.get_group(group_id).to_dict()['members']:
+            if user_id == member:
+                notification_service.send_notification(member, f"You joined the group {group_id}")
+            else:
+                notification_service.send_notification(member, f"{user_id} joined the group {group_id}")
+
         return jsonify({
             'success': True,
             'message': f'Group {updated_group.name} joined successfully!',
@@ -308,6 +316,14 @@ def leave_group():
         user_id = session['user_id']
         group_id = data['group_id']
         updated_group = group_service.leave_group(user_id, group_id)
+        group = group_service.get_group(group_id)
+        if group:
+            for member in group.to_dict()['members']:
+                if user_id == member:
+                    notification_service.send_notification(member, f"You left the group {group_id}")
+                else:
+                    notification_service.send_notification(member, f"{user_id} left the group {group_id}")
+
         return jsonify({
             'success': True,
             'message': f'You have left {updated_group.name}.',
@@ -351,7 +367,6 @@ def list_all_groups():
         'groups': group_list
     })
 
-
 @app.route("/api/notifications", methods=['GET'])
 def get_notifications():
     if 'user_id' not in session:
@@ -383,26 +398,65 @@ def mark_notification_as_read():
     except ValueError as e:
         return jsonify({'success': False, 'error': str(e)}), 400
 
+@app.route('/api/notifications/reminder', methods=['POST'])
+def send_reminder():
+    user_id = session['user_id']
+    if not user_id:
+        return jsonify({'success': False, 'error': 'Not logged in'}), 401
+
+
+
+
 @app.route("/api/study_schedule/create", methods=['POST'])
 def create_study_schedule():
     if 'user_id' not in session:
         return jsonify({'success': False, 'error': 'Not logged in'}), 401
 
     data = request.get_json() or {}
-    title = data.get('title')
-    start_time = data.get('start_time')
-    end_time = data.get('end_time')
-
+    title = data.get('session_name')
+    start_time = data.get('start_date')
+    end_time = data.get('end_date')
+    print(title,start_time,end_time)
+    group_id = data.get('group_id') or None
+    print(group_id)
     if not title or not start_time or not end_time:
         return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
-
     user_id = session['user_id']
     try:
-        schedule = study_scheduler_service.create_study_scheduler(user_id, title, start_time, end_time)
+        if group_id:
+            for member in group_service.get_group(group_id).to_dict()['members']:
+                schedule = study_scheduler_service.create_study_scheduler(member, title, start_time, end_time, group_id)
+                if user_id == member:
+                    notification_service.send_notification(member, f"You created a Study Schedule for Group {group_id} from {schedule['start_date']} to {schedule['end_date']}")
+                else:
+                    notification_service.send_notification(member, f"{user_id} rceated a Study Schedule for Group {group_id} from {schedule['start_date']} to {schedule['end_date']}")
+
+        else:
+            user_id = session['user_id']
+            schedule = study_scheduler_service.create_study_scheduler(user_id, title, start_time, end_time, group_id)
+
         return jsonify({
             'success': True,
             'message': f'Study schedule created successfully!',
             'study': schedule.to_dict()
+        })
+    except ValueError as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
+
+@app.route("/api/study_schedule/get", methods=['GET'])
+def get_study_schedule():
+    user_id = session['user_id']
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'Not logged in'}), 401
+    try:
+        schedules = study_scheduler_service.get_user_sessions(user_id)
+        schedule = [sessions.to_dict() for sessions in schedules]
+        for sessions in schedules:
+            print(sessions.to_dict())
+        return jsonify({
+            'success': True,
+            'message': f'Study schedules retrieved successfully!',
+            'study': schedule
         })
     except ValueError as e:
         return jsonify({'success': False, 'error': str(e)}), 400
@@ -417,6 +471,13 @@ def join_chat():
         return jsonify({'success': False, 'error': 'Invalid JSON format'}), 401
 
     chat = chat_service.join_chat(user_id, chat_id)
+    group = chat_service.get_chat(chat_id)
+    for member in group.to_dict()['members']:
+        if user_id == member:
+            notification_service.send_notification(member, f"You joined a Chat {chat_id}!")
+        else:
+            notification_service.send_notification(member, f"{user_id} joined a Chat {chat_id}!")
+
     print(chat)
     return jsonify({
         'success': True,
@@ -434,6 +495,8 @@ def create_chat():
     if not name or not owner_id:
         return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
     chat = chat_service.create_chat(name, owner_id , members)
+    notification_service.send_notification(owner_id, f"You created a Chat {owner_id}!")
+
     return jsonify({
         'success': True,
         'message': f'Chat created successfully!',
@@ -450,6 +513,11 @@ def send_message():
         return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
     print(chat_id, user_id, message)
     chat = chat_service.send_message(user_id, chat_id, message)
+    for member in group_service.get_group(chat_id).to_dict()['members']:
+        if user_id == member:
+            pass
+        else:
+            notification_service.send_notification(member, f"{user_id} just sent a Chat {chat_id}!")
     print(chat)
     return jsonify({
         'success': True,
@@ -480,6 +548,13 @@ def leave_chat():
         return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
 
     chat = chat_service.leave_chat(user_id, chat_id)
+    group = chat_service.get_chat(chat_id)
+    for member in group.to_dict()['members']:
+        if user_id == member:
+            notification_service.send_notification(member, f"You left a Chat {chat_id}!")
+        else:
+            notification_service.send_notification(member, f"{user_id} left a Chat {chat_id}!")
+
     return jsonify({
         'success': True,
         'message': f'Chat leaved successfully!',

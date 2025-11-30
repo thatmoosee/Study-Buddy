@@ -7,6 +7,7 @@ Built by: Josh Topp
 
 import json
 import os
+from datetime import datetime
 from sched import scheduler
 
 from models.study_scheduler import StudyScheduler
@@ -28,8 +29,8 @@ class StudySchedulerRepository(BaseRepository):
                 scheduler = StudyScheduler(
                     user_id=s['user_id'],
                     title=s['title'],
-                    start_time=s['start_time'],
-                    end_time=s['end_time'],
+                    start_time= s['start_time'],
+                    end_time= s['end_time'],
                     id=s['id']
                 )
                 self._storage[scheduler.id] = scheduler
@@ -50,7 +51,7 @@ class StudySchedulerRepository(BaseRepository):
             'user_id': schedule.user_id,
             'title': schedule.title,
             'start_time': schedule.start_time,
-            'end_time': schedule.end_time
+            'end_time': schedule.end_time,
         } for schedule in self._storage.values()}
 
         with open(self._json_file, 'w') as f:
@@ -77,3 +78,6 @@ class StudySchedulerRepository(BaseRepository):
 
     def find_by_id(self, id):
         return self._storage.get(id)
+
+    def get_sessions_by_user(self, user_id):
+        return [schedule for schedule in self._storage.values() if user_id == schedule.user_id]

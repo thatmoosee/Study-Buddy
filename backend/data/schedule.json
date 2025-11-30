@@ -2,8 +2,29 @@
     "1": {
         "id": 1,
         "user_id": 2,
-        "title": "CompSci Session",
-        "start_time": "Mon 10",
-        "end_time": "Mon 12"
+        "title": "test2",
+        "start_time": "12/01/2025 10:00PM",
+        "end_time": "12/01/2025 11:00PM"
+    },
+    "2": {
+        "id": 2,
+        "user_id": 4,
+        "title": "test2",
+        "start_time": "12/01/2025 10:00PM",
+        "end_time": "12/01/2025 11:00PM"
+    },
+    "3": {
+        "id": 3,
+        "user_id": 2,
+        "title": "test3",
+        "start_time": "12/01/2025 12:00PM",
+        "end_time": "12/01/2025 12:30PM"
+    },
+    "4": {
+        "id": 4,
+        "user_id": 4,
+        "title": "test3",
+        "start_time": "12/01/2025 12:00PM",
+        "end_time": "12/01/2025 12:30PM"
     }
 }

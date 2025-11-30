@@ -1,56 +1,41 @@
 {
-    "36eaa5832c8b4022a3474e381d0caf5e": {
-        "id": "36eaa5832c8b4022a3474e381d0caf5e",
-        "name": "group1",
-        "owner_id": 2,
-        "members": [
-            2
-        ],
-        "study_times": [],
-        "specified_class": []
-    },
-    "6755bcd1bc5641208df14027b0e999b2": {
-        "id": "6755bcd1bc5641208df14027b0e999b2",
-        "name": "group2",
-        "owner_id": 2,
-        "members": [
-            2
-        ],
-        "study_times": [],
-        "specified_class": []
-    },
-    "4b454bc97d354c7f8c4eadf825f2cd27": {
-        "id": "4b454bc97d354c7f8c4eadf825f2cd27",
-        "name": "group3",
-        "owner_id": 2,
-        "members": [
-            2
-        ],
-        "study_times": [],
-        "specified_class": []
-    },
-    "2f22ab261d704c009d5edea4f241981d": {
-        "id": "2f22ab261d704c009d5edea4f241981d",
-        "name": "newgroup",
-        "owner_id": 2,
-        "members": [
-            2
-        ],
-        "study_times": [
-            "Mon 10-12"
-        ],
-        "specified_class": "IT 327"
-    },
     "53b886e1860944b293b8d9cc14b309be": {
         "id": "53b886e1860944b293b8d9cc14b309be",
         "name": "IT 326 Group",
         "owner_id": 2,
         "members": [
-            2
+            2,
+            4
         ],
         "study_times": [
             "Mon 10-12"
         ],
         "specified_class": "IT 326"
+    },
+    "ef0fcf3096a44a45bcdfafa2fc5c7317": {
+        "id": "ef0fcf3096a44a45bcdfafa2fc5c7317",
+        "name": "IT 327 Group",
+        "owner_id": 2,
+        "members": [
+            2
+        ],
+        "study_times": [
+            "Tues 8-10",
+            "Thurs 8-10"
+        ],
+        "specified_class": "IT 327"
+    },
+    "34bb53300176499d99eaef2ae8b19d17": {
+        "id": "34bb53300176499d99eaef2ae8b19d17",
+        "name": "IT 383 Group",
+        "owner_id": 2,
+        "members": [
+            2
+        ],
+        "study_times": [
+            "Mon 6-8",
+            "Wed 6-8"
+        ],
+        "specified_class": "IT 383"
     }
 }

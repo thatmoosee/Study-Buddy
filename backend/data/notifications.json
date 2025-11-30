@@ -1,3 +1,9 @@
 {
-
+    "1": {
+        "id": 1,
+        "user_id": 4,
+        "message": "2 left the group 53b886e1860944b293b8d9cc14b309be",
+        "read": false,
+        "created_at": null
+    }
 }

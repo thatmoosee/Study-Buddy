@@ -6,7 +6,8 @@ async function checkAuth() {
         window.location.href = "index.html";
         return;
     }
-
+    const id = data.user.user_id;
+    document.body.setAttribute('user_id', id);
     document.getElementById("userEmail").textContent =
         "Logged in as: " + data.user.email;
 }
@@ -45,6 +46,118 @@ async function loadFilteredGroups(filterType, filterValue){
         list.appendChild(li);
     })
 }
+
+
+async function loadSessions(){
+    const res = await fetch("/api/study_schedule/get")
+    if(!res.ok) return;
+
+    const data = await res.json();
+
+    const list = document.getElementById("reminderList")
+    list.innerHTML = "";
+
+    if(data.study.length === 0){
+        list.innerHTML = "<p>There are no sessions.</p>";
+        return;
+    }
+
+    data.study.forEach( session => {
+        const li = document.createElement("li");
+        li.className = "study-item";
+        li.textContent = `${session.title} ${session.start_time} - ${session.end_time}`;
+        list.appendChild(li)
+    });
+}
+
+document.getElementById("scheduleSession").addEventListener("click", async () => {
+    const popup = document.getElementById("studySessionPopup");
+    //const id = popup.getAttribute('group_id').trim();
+    //if(!id) return;
+    const groupInfoPopup = document.getElementById("groupInfoPopup");
+    groupInfoPopup.style.display = "none";
+    popup.style.display = "flex";
+
+});
+
+const closeScheduleBtn = document.getElementById('closeScheduleBtn');
+const createScheduleBtn = document.getElementById('createScheduleBtn');
+
+closeScheduleBtn.addEventListener("click", () => {
+    document.getElementById("studySessionPopup").style.display = "none";
+});
+
+createScheduleBtn.addEventListener("click", async () => {
+
+    const session_name = document.getElementById("session_name").value;
+    const start_date = document.getElementById("start_time").value;
+    const end_date = document.getElementById("end_time").value;
+    const popup = document.getElementById("groupInfoPopup");
+    const id = popup.getAttribute('group_id').trim();
+    const res = await fetch("/api/study_schedule/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json"},
+        body: JSON.stringify({
+            session_name: session_name,
+            start_date: start_date,
+            end_date: end_date,
+            group_id: id
+        })
+    });
+    const data = await res.json();
+    loadSessions();
+});
+
+document.getElementById("joinGroupBtn").addEventListener("click", async () => {
+    const popup = document.getElementById("groupInfoPopup");
+    const err = document.getElementById("joinGroupError");
+    err.textContent = "";
+    const id = popup.getAttribute('group_id').trim();
+    if (!id) {
+        err.textContent = "Group ID required.";
+        return;
+    }
+
+    const res = await fetch("/api/group/join", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ group_id: id })
+    });
+
+    const data = await res.json();
+    if (!data.success) {
+        err.textContent = data.error;
+    } else {
+        loadGroups();
+        loadAllGroups();
+    }
+});
+
+document.getElementById("leaveGroupBtn").addEventListener("click", async () => {
+    const popup = document.getElementById("groupInfoPopup");
+    const err = document.getElementById("leaveGroupError");
+    err.textContent = "";
+    const id = popup.getAttribute("group_id");
+    if (!id) {
+        err.textContent = "Group ID required.";
+        return;
+    }
+    const res = await fetch("/api/group/leave", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ group_id: id })
+    });
+
+    const data = await res.json();
+    if (!data.success) {
+        err.textContent = data.error;
+    } else {
+        loadGroups();
+        loadAllGroups();
+        document.getElementById("groupInfoPopup").style.display = "none";
+    }
+});
+
 
 async function loadAllGroups() {
     const res = await fetch("/api/group/listall")
@@ -125,23 +238,42 @@ document.getElementById("filterConfirmBtn").addEventListener("click", () => {
     loadFilteredGroups(filterType, filterValue);
 });
 
-function openGroupInfo(group) {
+async function openGroupInfo(group) {
     const popup = document.getElementById("groupInfoPopup");
     document.getElementById("groupTitle").textContent = group.name;
     document.getElementById("groupId").textContent = group.id;
     document.getElementById("groupMembers").textContent = group.members.join(", ");
-    if(group.specified_class.length == 0){
+    popup.setAttribute("group_id", group.id);
+
+    if(group.specified_class.length === 0){
         document.getElementById("specifiedClass").textContent = "None";
     }
     else{
         document.getElementById("specifiedClass").textContent = group.specified_class;
 
     }
-    if(group.study_times.length == 0){
+    if(group.study_times.length === 0){
         document.getElementById("studyTimes").textContent = "None";
     }
     else{
         document.getElementById("studyTimes").textContent = group.study_times.join(",");
+    }
+
+    const joinButton = document.getElementById('joinGroupBtn');
+    const leaveButton = document.getElementById('leaveGroupBtn');
+    const scheduleSessionButton = document.getElementById('scheduleSession');
+    const user_id = document.body.getAttribute('user_id');
+    const isMember = group.members.includes(2);
+    if(isMember){
+        scheduleSessionButton.style.display="flex";
+        joinButton.style.display = "none";
+        leaveButton.style.display = 'block';
+    }
+    else{
+        scheduleSessionButton.style.display = "none";
+        joinButton.style.display = "block";
+        leaveButton.style.display = "none";
+
     }
     popup.style.display = "flex";
 }
@@ -161,14 +293,7 @@ const createConfirmBtn = document.getElementById("createGroupConfirmBtn");
 const createCancelBtn = document.getElementById("createGroupCancelBtn");
 
 createBtn.addEventListener("click", () => {
-    const groupName = groupNameInput.value.trim();
-    if (!groupName) {
-        document.getElementById("createGroupError").textContent = "Please enter a group name.";
-        return;
-    }
-    document.getElementById("createGroupError").textContent = "";
-
-    groupDisplay.textContent = groupName;
+    groupDisplay.textContent = "";
     groupClassInput.value = "";
     groupTimesInput.value = "";
     createPopup.style.display = "flex";
@@ -179,18 +304,19 @@ createCancelBtn.addEventListener("click", () => {
 });
 
 createConfirmBtn.addEventListener("click", async () => {
+    const groupName = groupNameInput.value.trim()
     const className = groupClassInput.value.trim();
     const times = groupTimesInput.value.trim();
 
-    if (!className || !times) {
-        alert("Please enter both class and study times.");
+    if (!className) {
+        alert("Please enter a class");
         return;
     }
     const res = await fetch("/api/group/create", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({
-            name: groupDisplay.textContent,
+            name: groupName,
             specified_class: className,
             study_times: times.split(",").map(t => t.trim())
         })
@@ -208,4 +334,5 @@ createConfirmBtn.addEventListener("click", async () => {
 });
 checkAuth();
 loadGroups();
+loadSessions();
 loadAllGroups();

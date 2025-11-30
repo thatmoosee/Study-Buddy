@@ -74,6 +74,8 @@ class ChatService:
                 user_chats[chat.chat_id] = chat.to_dict()
         return user_chats
 
+    def get_chat(self,chat_id):
+        chat = self.chat_repo.get(chat_id)
 
 
 

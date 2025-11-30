@@ -12,7 +12,7 @@ class GroupService:
     def __init__(self, group_repo):
         self.group_repo = group_repo
         
-    def create_group(self, name, owner_id, members=None, class_name=None, study_times=None):
+    def create_group(self, name, owner_id, members=None, study_times=None, class_name=None):
         """Create a new group"""
         # Group constructor already adds owner to members, no need to do it again
         group = Group(name, owner_id, members, class_name, study_times)
@@ -76,4 +76,7 @@ class GroupService:
 
     def filter_by_study_times(self, study_times):
         """Filter groups by specific study times"""
-        return self.group_repo.filter_by(None, study_times=study_times)
+        return self.group_repo.filter_by(study_times=study_times)
+
+    def get_group(self, group_id):
+        return self.group_repo.find_by_id(group_id)
