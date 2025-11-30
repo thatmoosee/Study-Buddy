@@ -1,7 +1,7 @@
 """
 Friend service for friendship management
 
-Built by: Max Quirk
+Built by: Max Quirk and Jamie Morrone
 """
 
 from models.friend import Friend
@@ -9,8 +9,9 @@ from models.friend import Friend
 class FriendService:
     """Handles friendship logic"""
 
-    def __init__(self, friend_repo):
+    def __init__(self, friend_repo, user_repo):
         self.friend_repo = friend_repo
+        self.user_repo = user_repo
 
     def remove_friend(self, user_id, friend_id):
         """
@@ -26,18 +27,15 @@ class FriendService:
         self.friend_repo.remove(friendship.id)
         return True
 
-    # PLACEHOLDER: Foundation for future AddFriend feature
     def add_friend(self, user_id, friend_id):
-        """
-        PLACEHOLDER: Add friend functionality.
-        To be implemented when AddFriend feature is ready.
-        """
-        raise NotImplementedError("AddFriend feature not yet implemented")
+        user = self.user_repo.find_by_id(user_id)
+        friend_user = self.user_repo.find_by_id(friend_id)
 
-    # PLACEHOLDER: Foundation for future FriendsList feature
+        if user is None or friend_user is None:
+            return False, "User not found"
+
+        self.friend_repo.add_friend(user_id, friend_id)
+        return True, "Friend added"
+
     def get_friends_list(self, user_id):
-        """
-        PLACEHOLDER: Get friends list functionality.
-        To be implemented when FriendsList feature is ready.
-        """
-        raise NotImplementedError("FriendsList feature not yet implemented")
+        return self.friend_repo.get_friends_list(user_id)

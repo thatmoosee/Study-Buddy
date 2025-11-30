@@ -579,6 +579,31 @@ def list_friends():
 
 # main entry point
 
+@app.route('/api/friends/add', methods=['POST'])
+def add_friend():
+    data = request.get_json()
+    user = data.get("user")
+    friend = data.get("friend")
+
+    success, message = friend_service.add_friend(user, friend)
+
+    return jsonify({
+        "success": success,
+        "message": message
+    }), (200 if success else 400)
+
+@app.route("/remove_friend", methods=["POST"])
+def remove_friend():
+    data = request.get_json()
+    user_id = data.get("user")
+    friend_id = data.get("friend")
+
+    try:
+        success = friend_service.remove_friend(user_id, friend_id)
+        return jsonify({"success": success})
+    except ValueError as e:
+        return jsonify({"success": False, "message": str(e)}), 400
+
 if __name__ == '__main__':
     print("Study Buddy running at http://localhost:5000")
     # Only enable debug mode in development, and don't expose to all interfaces
