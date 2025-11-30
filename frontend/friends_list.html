@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>Study Buddy</title>  
+        <link rel="icon" type="image/x-icon" href="img/icon.png">
+        <link rel="stylesheet" href="css/style.css">
+    </head>
+    <body>
+        <header>
+            <h1>Study Buddy</h1>
+            <navbar>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="search.html">Search</a></li>
+                    <li><a href="filter_by_class.html">Filter by Class</a></li>
+                    <li><a href="filter_free_time.html">Filter by Free Time</a></li>
+                    <li><a href="chats.html">Chats</a></li>
+                    <li><a href="friends_list.html">Friends List</a></li>
+                </ul>
+            </navbar>
+            </header>
+    <main>
+        <h2>Your Friends List</h2>
+       <a href="profile.html"><img id="profile" src="img/profile.png"></a>
+            <p>
+                Max Quirk
+                <button class="remove-friend-btn" data-friend-id="1">Remove</button>
+            </p>
+
+            <p>
+                Josh Topp
+                <button class="remove-friend-btn" data-friend-id="2">Remove</button>
+            </p>
+
+             <p>
+                Josh Schmidt
+                <button class="remove-friend-btn" data-friend-id="3">Remove</button>
+            </p>
+
+            <p>
+                Jamie Morrone
+                <button class="remove-friend-btn" data-friend-id="4">Remove</button>
+            </p>
+
+            <p>
+                David Lewis
+                <button class="remove-friend-btn" data-friend-id="5">Remove</button>
+            </p>
+        
+        <form id="AddFriendForm">
+            <label for="class">Add Friends</label><br>
+            <input type="text" id="class" name="class" placeholder="Type name here"><br><br>
+            <button type="submit">Add friend</button>
+        </form>
+
+        <div id="results">
+            
+        </div>
+    </main>
+
+    
+            
+        </div>
+    </main>
+    <footer></footer>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const userId = sessionStorage.getItem("user_id");
+
+        const removeButtons = document.querySelectorAll(".remove-friend-btn");
+
+        removeButtons.forEach(button => {
+            button.addEventListener("click", async () => {
+                const friendId = button.dataset.friendId;
+
+                const response = await fetch("http://localhost:5000/remove_friend", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        user_id: userId,
+                        friend_id: friendId
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert("Friend removed!");
+                    location.reload();
+                } else {
+                    alert("Error: " + data.message);
+                }
+            });
+        });
+    });
+    </script>
+</body>
+</html>

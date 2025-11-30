@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Study Buddy - Search For Student</title>  
+        <link rel="icon" type="image/x-icon" href="img/icon.png">
+        <link rel="stylesheet" href="css/style.css">
+    </head>
+    <body>
+        <header>
+            <div>
+                <h1>Study Buddy</h1>
+            </div>
+            <navbar>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="search.html">Search Groups</a></li>
+                    <li><a href="search_student.html" class="active">Search Students</a></li>
+                    <li><a href="filter_by_class.html">Filter by Class</a></li>
+                    <li><a href="filter_free_time.html">Filter by Free Time</a></li>
+                    <li><a href="chats.html">Chats</a></li>
+                </ul>
+            </navbar>
+        </header>
+
+        <main>
+            <a href="profile.html"><img id="profile" src="img/profile.png" alt="Profile"></a>
+
+            <div id="searchbar">
+                <form id="studentSearchForm" onsubmit="event.preventDefault(); searchStudent();">
+                    <input type="email" id="searchEmail" placeholder="Enter student email..." required>
+                    <button type="submit"><img src="img/search.png" alt="Search"></button>
+                </form>
+            </div>
+
+            <div id="searchResultContainer">
+                <h2>Search Results</h2>
+                <pre id="searchResult">No results yet.</pre>
+            </div>
+        </main>
+
+        <footer>
+        </footer>
+
+        <script>
+        async function searchStudent() {
+            const email = document.getElementById("searchEmail").value.trim();
+            const resultDiv = document.getElementById("searchResult");
+
+            if (!email) {
+                alert("Please enter an email address.");
+                return;
+            }
+
+            try {
+                const res = await fetch(`/students/search?email=${encodeURIComponent(email)}`);
+                const data = await res.json();
+
+                if (data.found) {
+                    resultDiv.textContent = JSON.stringify(data.student, null, 2);
+                } else {
+                    resultDiv.textContent = data.message || "Student not found.";
+                }
+            } catch (err) {
+                console.error(err);
+                resultDiv.textContent = "Error searching for student.";
+            }
+        }
+        </script>
+    </body>
+</html>
