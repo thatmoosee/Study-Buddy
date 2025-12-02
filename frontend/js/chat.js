@@ -31,7 +31,7 @@ async function loadAllChats() {
 
     chatValues.forEach(c => {
         const li = document.createElement("li");
-        li.className = "chat-item";
+        li.className = "group-item";
         li.textContent = c.name;
         li.style.cursor = "pointer";
 

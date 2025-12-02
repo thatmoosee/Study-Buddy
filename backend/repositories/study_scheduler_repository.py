@@ -7,6 +7,7 @@ Built by: Josh Topp
 
 import json
 import os
+from datetime import datetime
 from sched import scheduler
 
 from models.study_scheduler import StudyScheduler
@@ -77,3 +78,6 @@ class StudySchedulerRepository(BaseRepository):
 
     def find_by_id(self, id):
         return self._storage.get(id)
+
+    def get_sessions_by_user(self, user_id):
+        return [schedule for schedule in self._storage.values() if user_id == schedule.user_id]

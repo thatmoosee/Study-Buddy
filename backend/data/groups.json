@@ -1,57 +1,42 @@
 {
-    "36eaa5832c8b4022a3474e381d0caf5e": {
-        "id": "36eaa5832c8b4022a3474e381d0caf5e",
-        "name": "group1",
+    "25501dfea6e9497082bb9df24cb479ef": {
+        "id": "25501dfea6e9497082bb9df24cb479ef",
+        "name": "IT 326 Group Section 001",
         "owner_id": 2,
         "members": [
             2,
-            1
-        ],
-        "study_times": [],
-        "specified_class": ""
-    },
-    "6755bcd1bc5641208df14027b0e999b2": {
-        "id": "6755bcd1bc5641208df14027b0e999b2",
-        "name": "group2",
-        "owner_id": 2,
-        "members": [
-            2
-        ],
-        "study_times": [],
-        "specified_class": ""
-    },
-    "4b454bc97d354c7f8c4eadf825f2cd27": {
-        "id": "4b454bc97d354c7f8c4eadf825f2cd27",
-        "name": "group3",
-        "owner_id": 2,
-        "members": [
-            2
-        ],
-        "study_times": [],
-        "specified_class": ""
-    },
-    "2f22ab261d704c009d5edea4f241981d": {
-        "id": "2f22ab261d704c009d5edea4f241981d",
-        "name": "newgroup",
-        "owner_id": 2,
-        "members": [
-            2
+            4
         ],
         "study_times": [
-            "Mon 10-12"
-        ],
-        "specified_class": "IT 327"
-    },
-    "53b886e1860944b293b8d9cc14b309be": {
-        "id": "53b886e1860944b293b8d9cc14b309be",
-        "name": "IT 326 Group",
-        "owner_id": 2,
-        "members": [
-            2
-        ],
-        "study_times": [
-            "Mon 10-12"
+            "Mon 10-12pm",
+            "Wed 10-12pm"
         ],
         "specified_class": "IT 326"
+    },
+    "7e0c68b9c1cb491892e0bf8d1f606fb7": {
+        "id": "7e0c68b9c1cb491892e0bf8d1f606fb7",
+        "name": "IT 383 Section 001",
+        "owner_id": 2,
+        "members": [
+            2
+        ],
+        "study_times": [
+            "Tues 8-10pm",
+            "Thur 8-10pm"
+        ],
+        "specified_class": "IT 383"
+    },
+    "0e6a79ed6da04bd7ac575553db2f8731": {
+        "id": "0e6a79ed6da04bd7ac575553db2f8731",
+        "name": "IT 386 Section 001",
+        "owner_id": 2,
+        "members": [
+            2
+        ],
+        "study_times": [
+            "Mon 8-10pm",
+            "Wed 8-10pm"
+        ],
+        "specified_class": "IT 386"
     }
 }

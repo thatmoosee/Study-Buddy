@@ -1,28 +1,25 @@
 {
-    "1": {
-        "chat_id": 1,
-        "name": "Test",
-        "messages": [
-            "hello",
-            "hello",
-            "test",
-            "hello"
-        ],
+    "0754af5d6efe403e865fb0129f5e3a43": {
+        "name": "IT 327 Group",
+        "chat_id": "0754af5d6efe403e865fb0129f5e3a43",
+        "messages": [],
+        "members": []
+    },
+    "25501dfea6e9497082bb9df24cb479ef": {
+        "name": "IT 326 Group Section 001",
+        "chat_id": "25501dfea6e9497082bb9df24cb479ef",
+        "messages": [],
         "members": [
             2,
-            3
+            4
         ]
     },
-    "2": {
-        "chat_id": 2,
-        "name": "Test1",
-        "messages": null,
-        "members": []
-    },
-    "3": {
-        "chat_id": 3,
-        "name": "Test1",
-        "messages": null,
-        "members": []
+    "7e0c68b9c1cb491892e0bf8d1f606fb7": {
+        "name": "IT 383 Section 001",
+        "chat_id": "7e0c68b9c1cb491892e0bf8d1f606fb7",
+        "messages": [],
+        "members": [
+            2
+        ]
     }
 }

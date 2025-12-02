@@ -12,10 +12,14 @@ class ChatService:
     def __init__(self, chat_repo):
         self.chat_repo = chat_repo
 
-    def create_chat(self, name, owner_id, members=None):
+    def create_chat(self, name, owner_id, members=None, group_id=None):
         members = members or []
-        chat_id = len(self.chat_repo.storage()) + 1
-        chat = Chat(chat_id, name)
+        if group_id is not None:
+            chat_id = group_id
+        else:
+            chat_id = str(len(self.chat_repo.storage()) + 1)
+
+        chat = Chat(name, chat_id)
         chat.members = [owner_id] + members
         self.chat_repo.add(chat)
         return chat
@@ -61,6 +65,8 @@ class ChatService:
     def send_message(self, user_id, chat_id, message):
         chat = self.chat_repo.get(chat_id)
         if chat:
+            if chat.messages is None:
+                chat.messages = []
             new_message = f"{user_id}: {message}"
             chat.messages.append(new_message)
             self.chat_repo.update(chat_id, chat)
@@ -73,6 +79,9 @@ class ChatService:
             if user_id in chat.members:
                 user_chats[chat.chat_id] = chat.to_dict()
         return user_chats
+
+    def get_chat(self, chat_id):
+        chat = self.chat_repo.get(chat_id)
 
 
 

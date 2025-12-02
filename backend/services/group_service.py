@@ -12,13 +12,8 @@ class GroupService:
     def __init__(self, group_repo):
         self.group_repo = group_repo
         
-    def create_group(self, name, owner_id, members=None, class_name=None, study_times=None):
+    def create_group(self, name, owner_id, members=None, study_times=None, class_name=None):
         """Create a new group"""
-        # Check for duplicate group name
-        existing_group = self.group_repo.find_by_name(name)
-        if existing_group:
-            raise ValueError(f"A group with the name '{name}' already exists")
-
         # Group constructor already adds owner to members, no need to do it again
         group = Group(name, owner_id, members, class_name, study_times)
         self.group_repo.add(group)
@@ -28,9 +23,6 @@ class GroupService:
         """Add a user to a group by ID or name"""
         # Try to find by ID first, then by name
         group = self.group_repo.get(group_identifier)
-        if not group:
-            group = self.group_repo.find_by_name(group_identifier)
-
         if not group:
             raise ValueError("Group not found")
 
@@ -45,9 +37,6 @@ class GroupService:
         """Remove a user from a group by ID or name"""
         # Try to find by ID first, then by name
         group = self.group_repo.get(group_identifier)
-        if not group:
-            group = self.group_repo.find_by_name(group_identifier)
-
         if not group:
             raise ValueError("Group not found")
 
@@ -90,3 +79,6 @@ class GroupService:
     def filter_by_study_times(self, study_times):
         """Filter groups by specific study times"""
         return self.group_repo.filter_by(None, study_times=study_times)
+
+    def get_group(self, group_id):
+        return self.group_repo.find_by_id(group_id)

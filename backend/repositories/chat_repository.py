@@ -15,7 +15,6 @@ class ChatRepository(BaseRepository):
     def __init__(self, filepath='data/chat.json'):
         self._json_file = os.path.abspath(filepath)
         self._storage = {}
-        self._id_counter = 1
         self._load_from_file()
 
 
@@ -28,18 +27,15 @@ class ChatRepository(BaseRepository):
                 data = json.load(f)
             for c in data.values():
                 chat = Chat(
-                    chat_id=c['chat_id'],
                     name=c['name'],
+                    chat_id=c['chat_id'],
                     messages=c['messages'],
                     members=c['members']
                 )
                 self._storage[chat.chat_id] = chat
-                if chat.chat_id >= self._id_counter:
-                    self._id_counter = chat.chat_id + 1
         except (FileNotFoundError, json. JSONDecodeError) as e:
             print(f"No exisiting chat data or error loading: {e}")
             self._storage = {}
-            self._id_counter = 1
 
     def _save_to_file(self):
         directory = os.path.dirname(self._json_file)
@@ -47,8 +43,8 @@ class ChatRepository(BaseRepository):
             os.makedirs(directory, exist_ok=True)
 
         data = {str(chat.chat_id): {
-            'chat_id': chat.chat_id,
             'name': chat.name,
+            'chat_id': chat.chat_id,
             'messages': chat.messages,
             'members': chat.members
         } for chat in self._storage.values()}
