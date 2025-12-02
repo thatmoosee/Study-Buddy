@@ -19,11 +19,16 @@ class BaseModel(ABC):
     @property
     def id(self):
         return self._id
-    
+
     #Set ID
     @id.setter
     def id(self, value):
         self._id = value
+
+    #Getting created_at
+    @property
+    def created_at(self):
+        return self._created_at
 
     #Must implmenet to dictionairty for JSON
     @abstractmethod

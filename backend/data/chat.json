@@ -21,5 +21,14 @@
         "members": [
             2
         ]
+    },
+    "4": {
+        "name": "DM_2_1",
+        "chat_id": "4",
+        "messages": [],
+        "members": [
+            2,
+            1
+        ]
     }
 }

@@ -11,50 +11,100 @@
     <main>
         <h2>Your Friends List</h2>
        <a href="profile.html"><img id="profile" src="img/profile.png"></a>
-            <p>
-                Max Quirk
-                <button class="remove-friend-btn" data-friend-id="1">Remove</button>
-            </p>
 
-            <p>
-                Josh Topp
-                <button class="remove-friend-btn" data-friend-id="2">Remove</button>
-            </p>
+        <div id="friends-container">
+            <p>Loading friends...</p>
+        </div>
 
-             <p>
-                Josh Schmidt
-                <button class="remove-friend-btn" data-friend-id="3">Remove</button>
-            </p>
+        <h3>Friend Requests</h3>
+        <div id="requests-container">
+            <p>Loading friend requests...</p>
+        </div>
 
-            <p>
-                Jamie Morrone
-                <button class="remove-friend-btn" data-friend-id="4">Remove</button>
-            </p>
-
-            <p>
-                David Lewis
-                <button class="remove-friend-btn" data-friend-id="5">Remove</button>
-            </p>
-        
+        <h3>Send Friend Request</h3>
         <form id="AddFriendForm">
-            <label for="class">Add Friends</label><br>
-            <input type="text" id="class" name="class" placeholder="Type name here"><br><br>
-            <button type="submit">Add friend</button>
+            <label for="friendEmail">Friend's Email:</label><br>
+            <input type="email" id="friendEmail" name="friendEmail" placeholder="Enter email address" required><br><br>
+            <button type="submit">Send Friend Request</button>
         </form>
 
-        <div id="results">
-
-        </div>
     </main>
     <footer></footer>
 
     <script>
-    document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener("DOMContentLoaded", async () => {
+        // Load friends list and requests
+        await loadFriendsList();
+        await loadFriendRequests();
+
+        // Handle send friend request form submission
+        const addFriendForm = document.getElementById("AddFriendForm");
+        addFriendForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const friendEmail = document.getElementById("friendEmail").value.trim();
+
+            if (!friendEmail) {
+                alert("Please enter an email address");
+                return;
+            }
+
+            await sendFriendRequest(friendEmail);
+            document.getElementById("friendEmail").value = "";
+        });
+    });
+
+    async function loadFriendsList() {
+        const friendsContainer = document.getElementById("friends-container");
+
+        try {
+            const response = await fetch("/api/friend/list", {
+                method: "GET",
+                headers: { "Content-Type": "application/json" }
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                const friends = data.friends;
+
+                if (friends.length === 0) {
+                    friendsContainer.innerHTML = "<p>No friends yet. Add some friends to get started!</p>";
+                    return;
+                }
+
+                // Display friends
+                friendsContainer.innerHTML = "";
+                friends.forEach(friend => {
+                    const friendElement = document.createElement("p");
+                    friendElement.innerHTML = `
+                        ${friend.email || friend.id}
+                        <button class="remove-friend-btn" data-friend-id="${friend.id}">Remove</button>
+                    `;
+                    friendsContainer.appendChild(friendElement);
+                });
+
+                // Attach remove button handlers
+                attachRemoveHandlers();
+            } else {
+                friendsContainer.innerHTML = "<p>Error loading friends.</p>";
+            }
+        } catch (error) {
+            console.error("Error loading friends:", error);
+            friendsContainer.innerHTML = "<p>Failed to load friends.</p>";
+        }
+    }
+
+    function attachRemoveHandlers() {
         const removeButtons = document.querySelectorAll(".remove-friend-btn");
 
         removeButtons.forEach(button => {
             button.addEventListener("click", async () => {
                 const friendId = button.dataset.friendId;
+
+                if (!confirm("Are you sure you want to remove this friend?")) {
+                    return;
+                }
 
                 const response = await fetch("/api/friend/remove", {
                     method: "POST",
@@ -68,13 +118,139 @@
 
                 if (data.success) {
                     alert("Friend removed successfully!");
-                    location.reload();
+                    await loadFriendsList();
                 } else {
                     alert("Error: " + (data.error || data.message));
                 }
             });
         });
-    });
+    }
+
+    async function sendFriendRequest(friendEmail) {
+        try {
+            const response = await fetch("/api/friend/request", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    email: friendEmail
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                alert(data.message || "Friend request sent successfully!");
+            } else {
+                alert("Error: " + (data.error || data.message));
+            }
+        } catch (error) {
+            console.error("Error sending friend request:", error);
+            alert("Failed to send friend request. Please try again.");
+        }
+    }
+
+    async function loadFriendRequests() {
+        const requestsContainer = document.getElementById("requests-container");
+
+        try {
+            const response = await fetch("/api/friend/requests", {
+                method: "GET",
+                headers: { "Content-Type": "application/json" }
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                const requests = data.requests;
+
+                if (requests.length === 0) {
+                    requestsContainer.innerHTML = "<p>No pending friend requests.</p>";
+                    return;
+                }
+
+                // Display friend requests
+                requestsContainer.innerHTML = "";
+                requests.forEach(request => {
+                    const requestElement = document.createElement("div");
+                    requestElement.style.border = "1px solid #ccc";
+                    requestElement.style.padding = "10px";
+                    requestElement.style.margin = "10px 0";
+                    requestElement.style.borderRadius = "5px";
+                    requestElement.innerHTML = `
+                        <p><strong>From:</strong> ${request.from_email}</p>
+                        <button class="accept-request-btn" data-request-id="${request.request_id}">Accept</button>
+                        <button class="reject-request-btn" data-request-id="${request.request_id}">Reject</button>
+                    `;
+                    requestsContainer.appendChild(requestElement);
+                });
+
+                // Attach button handlers
+                attachRequestHandlers();
+            } else {
+                requestsContainer.innerHTML = "<p>Error loading friend requests.</p>";
+            }
+        } catch (error) {
+            console.error("Error loading friend requests:", error);
+            requestsContainer.innerHTML = "<p>Failed to load friend requests.</p>";
+        }
+    }
+
+    function attachRequestHandlers() {
+        // Accept buttons
+        const acceptButtons = document.querySelectorAll(".accept-request-btn");
+        acceptButtons.forEach(button => {
+            button.addEventListener("click", async () => {
+                const requestId = button.dataset.requestId;
+
+                const response = await fetch("/api/friend/accept", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        request_id: requestId
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert(data.message || "Friend request accepted!");
+                    await loadFriendsList();
+                    await loadFriendRequests();
+                } else {
+                    alert("Error: " + (data.error || data.message));
+                }
+            });
+        });
+
+        // Reject buttons
+        const rejectButtons = document.querySelectorAll(".reject-request-btn");
+        rejectButtons.forEach(button => {
+            button.addEventListener("click", async () => {
+                const requestId = button.dataset.requestId;
+
+                if (!confirm("Are you sure you want to reject this friend request?")) {
+                    return;
+                }
+
+                const response = await fetch("/api/friend/reject", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        request_id: requestId
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert(data.message || "Friend request rejected.");
+                    await loadFriendRequests();
+                } else {
+                    alert("Error: " + (data.error || data.message));
+                }
+            });
+        });
+    }
     </script>
 </body>
 </html>

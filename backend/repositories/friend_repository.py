@@ -31,12 +31,22 @@ class FriendRepository(BaseRepository):
                 with open(self.filepath, 'r') as f:
                     data = json.load(f)
                 for f_data in data.values():
+                    # Parse created_at if it exists
+                    from datetime import datetime
+                    created_at = None
+                    if 'created_at' in f_data and f_data['created_at']:
+                        try:
+                            created_at = datetime.fromisoformat(f_data['created_at'])
+                        except (ValueError, TypeError):
+                            created_at = None
+
                     friend = Friend(
                         user_id=f_data['user_id'],
                         friend_id=f_data['friend_id'],
-                        status=f_data.get('status', Friend.STATUS_ACCEPTED)
+                        status=f_data.get('status', Friend.STATUS_ACCEPTED),
+                        id=f_data['id'],
+                        created_at=created_at
                     )
-                    friend.id = f_data['id']
                     self._storage[friend.id] = friend
             except (json.JSONDecodeError, KeyError) as e:
                 print(f"Error loading friends: {e}")
@@ -139,19 +149,66 @@ class FriendRepository(BaseRepository):
         friendships = self.get_friends_for_user(user_id, status)
         return [f.get_other_user(user_id) for f in friendships]
 
-    def add_friend(self, user_id, friend_id):
+    def send_friend_request(self, user_id, friend_id):
         """
-        Add a friendship between two users.
-        Creates a Friend object and stores it.
+        Send a friend request from user_id to friend_id.
+        Creates a pending Friend object with user_id as the requester.
         """
         # Check if friendship already exists
         existing = self.find_friendship(user_id, friend_id)
         if existing:
             return existing
 
-        # Create new friendship
-        friend = Friend(user_id=user_id, friend_id=friend_id, status=Friend.STATUS_ACCEPTED)
+        # Create new pending friendship request
+        friend = Friend(user_id=user_id, friend_id=friend_id, status=Friend.STATUS_PENDING)
         return self.create(friend)
+
+    def accept_friend_request(self, friendship_id):
+        """
+        Accept a friend request by changing status to accepted.
+        """
+        friendship = self.find_by_id(friendship_id)
+        if not friendship:
+            raise ValueError("Friend request not found")
+
+        if friendship.status != Friend.STATUS_PENDING:
+            raise ValueError("Friend request is not pending")
+
+        friendship.status = Friend.STATUS_ACCEPTED
+        return self.update(friendship_id, friendship)
+
+    def reject_friend_request(self, friendship_id):
+        """
+        Reject a friend request by deleting it.
+        """
+        friendship = self.find_by_id(friendship_id)
+        if not friendship:
+            raise ValueError("Friend request not found")
+
+        if friendship.status != Friend.STATUS_PENDING:
+            raise ValueError("Friend request is not pending")
+
+        return self.remove(friendship_id)
+
+    def get_pending_requests_received(self, user_id):
+        """
+        Get pending friend requests where user_id is the recipient (friend_id).
+        Returns Friend objects where the user was sent a request.
+        """
+        return [
+            f for f in self._storage.values()
+            if f.friend_id == user_id and f.status == Friend.STATUS_PENDING
+        ]
+
+    def get_pending_requests_sent(self, user_id):
+        """
+        Get pending friend requests where user_id is the sender (user_id).
+        Returns Friend objects where the user sent a request.
+        """
+        return [
+            f for f in self._storage.values()
+            if f.user_id == user_id and f.status == Friend.STATUS_PENDING
+        ]
 
     def get_friends_list(self, user_id):
         """

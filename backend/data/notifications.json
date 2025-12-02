@@ -110,5 +110,19 @@
         "message": "You joined the group 25501dfea6e9497082bb9df24cb479ef",
         "read": false,
         "created_at": null
+    },
+    "17": {
+        "id": 17,
+        "user_id": 2,
+        "message": "You have a new friend request!",
+        "read": false,
+        "created_at": null
+    },
+    "18": {
+        "id": 18,
+        "user_id": 1,
+        "message": "Your friend request was accepted!",
+        "read": false,
+        "created_at": null
     }
 }

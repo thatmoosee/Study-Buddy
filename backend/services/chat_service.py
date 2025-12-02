@@ -46,9 +46,19 @@ class ChatService:
         raise ValueError("Chat not found.")
 
     def create_DM(self, user_id, friend_id):
-        chat_id = len(self.chat_repo.storage()) + 1
-        chat = Chat(chat_id, name=f"DM {user_id}-{friend_id}")
-        chat.members = [user_id] + [friend_id]
+        # Check if DM already exists (bidirectional check)
+        all_chats = self.chat_repo.find_all()
+        for chat in all_chats:
+            # Check if it's a DM between these two users (in either direction)
+            if (chat.name == f"DM_{user_id}_{friend_id}" or
+                chat.name == f"DM_{friend_id}_{user_id}"):
+                # DM already exists, return it
+                return chat
+
+        # Create new DM if it doesn't exist
+        chat_id = str(len(self.chat_repo.storage()) + 1)
+        chat_name = f"DM_{user_id}_{friend_id}"
+        chat = Chat(name=chat_name, chat_id=chat_id, members=[user_id, friend_id])
         self.chat_repo.add(chat)
         return chat
 

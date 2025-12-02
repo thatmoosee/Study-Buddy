@@ -320,20 +320,34 @@ def leave_group():
     try:
         user_id = session['user_id']
         group_id = data['group_id']
+
+        # Get group info before leaving
+        group_before = group_service.get_group(group_id)
+        if not group_before:
+            return jsonify({'success': False, 'error': 'Group not found'}), 400
+
+        group_name = group_before.name
+
+        # Leave the group (may delete if last member)
         updated_group = group_service.leave_group(user_id, group_id)
-        group = group_service.get_group(group_id)
         chat_service.leave_chat(user_id, group_id)
-        if group:
-            for member in group.to_dict()['members']:
-                if user_id == member:
-                    notification_service.send_notification(member, f"You left the group {group_id}")
-                else:
-                    notification_service.send_notification(member, f"{user_id} left the group {group_id}")
+
+        # Check if group still exists after leaving
+        group_after = group_service.get_group(group_id)
+
+        # Send notifications to remaining members
+        if group_after:
+            for member in group_after.members:
+                if member != user_id:
+                    notification_service.send_notification(member, f"{user_id} left the group {group_name}")
+
+        # Send notification to user who left
+        notification_service.send_notification(user_id, f"You left the group {group_name}")
 
         return jsonify({
             'success': True,
-            'message': f'You have left {updated_group.name}.',
-            'data': updated_group.to_dict()
+            'message': f'You have left {group_name}.',
+            'group_deleted': group_after is None
         })
     except ValueError as e:
         return jsonify({'success': False, 'error': str(e)}), 400
@@ -625,9 +639,9 @@ def remove_friend():
         return jsonify({'success': False, 'error': str(e)}), 400
 
 
-@app.route('/api/friend/add', methods=['POST'])
-def add_friend():
-    """Add a friend"""
+@app.route('/api/friend/request', methods=['POST'])
+def send_friend_request():
+    """Send a friend request by email"""
     if 'user_id' not in session:
         return jsonify({'success': False, 'error': 'Not logged in'}), 401
 
@@ -638,13 +652,100 @@ def add_friend():
     except Exception:
         return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
 
-    if 'friend_id' not in data:
-        return jsonify({'success': False, 'error': 'Friend ID is required'}), 400
+    if 'email' not in data:
+        return jsonify({'success': False, 'error': 'Email is required'}), 400
 
     try:
         user_id = session['user_id']
-        friend_id = data['friend_id']
-        success, message = friend_service.add_friend(user_id, friend_id)
+        friend_email = data['email']
+        success, message, friend_id = friend_service.send_friend_request(user_id, friend_email)
+
+        if success:
+            # Send notification to the recipient
+            notification_service.send_notification(friend_id, f"You have a new friend request!")
+            return jsonify({
+                'success': True,
+                'message': message
+            })
+        else:
+            return jsonify({'success': False, 'error': message}), 400
+    except ValueError as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
+
+
+@app.route('/api/friend/accept', methods=['POST'])
+def accept_friend_request():
+    """Accept a friend request"""
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'Not logged in'}), 401
+
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'error': 'Request body is required'}), 400
+    except Exception:
+        return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
+
+    if 'request_id' not in data:
+        return jsonify({'success': False, 'error': 'Request ID is required'}), 400
+
+    try:
+        user_id = session['user_id']
+        request_id = data['request_id']
+
+        # Get the friendship to find the other user
+        friendship = friend_service.friend_repo.find_by_id(request_id)
+        if not friendship:
+            return jsonify({'success': False, 'error': 'Friend request not found'}), 400
+
+        requester_id = friendship.user_id
+
+        success, message = friend_service.accept_friend_request(user_id, request_id)
+
+        if success:
+            # Create a DM chat between the two friends
+            try:
+                chat = chat_service.create_DM(user_id, requester_id)
+                notification_service.send_notification(requester_id, f"Your friend request was accepted!")
+                return jsonify({
+                    'success': True,
+                    'message': f'{message} A chat has been created!',
+                    'chat': chat.to_dict()
+                })
+            except Exception as e:
+                # Friend was accepted but chat creation failed
+                print(f"Warning: Friend request accepted but chat creation failed: {str(e)}")
+                return jsonify({
+                    'success': True,
+                    'message': message,
+                    'warning': 'Chat creation failed'
+                })
+        else:
+            return jsonify({'success': False, 'error': message}), 400
+    except ValueError as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
+
+
+@app.route('/api/friend/reject', methods=['POST'])
+def reject_friend_request():
+    """Reject a friend request"""
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'Not logged in'}), 401
+
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'error': 'Request body is required'}), 400
+    except Exception:
+        return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
+
+    if 'request_id' not in data:
+        return jsonify({'success': False, 'error': 'Request ID is required'}), 400
+
+    try:
+        user_id = session['user_id']
+        request_id = data['request_id']
+        success, message = friend_service.reject_friend_request(user_id, request_id)
 
         if success:
             return jsonify({
@@ -657,6 +758,24 @@ def add_friend():
         return jsonify({'success': False, 'error': str(e)}), 400
 
 
+@app.route('/api/friend/requests', methods=['GET'])
+def get_friend_requests():
+    """Get pending friend requests for the logged-in user"""
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'Not logged in'}), 401
+
+    try:
+        user_id = session['user_id']
+        requests = friend_service.get_pending_requests(user_id)
+
+        return jsonify({
+            'success': True,
+            'requests': requests
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
+
+
 @app.route('/api/friend/list', methods=['GET'])
 def list_friends():
     """Get list of friends for the logged-in user"""
@@ -665,7 +784,18 @@ def list_friends():
 
     try:
         user_id = session['user_id']
-        friends_list = friend_service.get_friends_list(user_id)
+        friend_ids = friend_service.get_friends_list(user_id)
+
+        # Fetch user details for each friend
+        friends_list = []
+        for friend_id in friend_ids:
+            friend_user = user_repo.find_by_id(friend_id)
+            if friend_user:
+                friends_list.append({
+                    'id': friend_user.id,
+                    'email': friend_user.email
+                })
+
         return jsonify({
             'success': True,
             'friends': friends_list
