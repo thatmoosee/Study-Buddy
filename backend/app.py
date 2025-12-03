@@ -524,7 +524,7 @@ def send_message():
         return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
     print(chat_id, user_id, message)
     chat = chat_service.send_message(user_id, chat_id, message)
-    for member in group_service.get_group(chat_id).to_dict()['members']:
+    for member in chat.members:
         if user_id == member:
             pass
         else:

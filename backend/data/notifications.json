@@ -124,5 +124,26 @@
         "message": "Your friend request was accepted!",
         "read": false,
         "created_at": null
+    },
+    "19": {
+        "id": 19,
+        "user_id": 2,
+        "message": "1 just sent a Chat 4!",
+        "read": false,
+        "created_at": null
+    },
+    "20": {
+        "id": 20,
+        "user_id": 2,
+        "message": "1 just sent a Chat 4!",
+        "read": false,
+        "created_at": null
+    },
+    "21": {
+        "id": 21,
+        "user_id": 1,
+        "message": "2 just sent a Chat 4!",
+        "read": false,
+        "created_at": null
     }
 }

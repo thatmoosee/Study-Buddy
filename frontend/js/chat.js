@@ -82,9 +82,9 @@ function openChatPopup(chat) {
         }
 
         messageInput.value = "";
+        loadAllChats();
         openChatPopup(result.study);
     };
-
     document.getElementById("closeChatPopupBtn").onclick = () => {
         document.getElementById("chatPopup").style.display = "none";
     };

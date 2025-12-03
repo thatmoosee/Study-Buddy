@@ -25,7 +25,17 @@
     "4": {
         "name": "DM_2_1",
         "chat_id": "4",
-        "messages": [],
+        "messages": [
+            "1: hey",
+            "2: hey",
+            "1: hi",
+            "1: hi",
+            "1: hi",
+            "1: hi",
+            "1: gh",
+            "1: 23",
+            "2: 45"
+        ],
         "members": [
             2,
             1
