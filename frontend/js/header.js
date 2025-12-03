@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 </li>
                 <li><a href="index.html">Home</a></li>
                 <li><a href="groups.html">Groups</a></li>
-                <li><a href="search.html">Search</a></li>
                 <li><a href="chat.html">Chats</a></li>
                 <li><a href="add_notifications.html">Notifications</a></li>
                 <li><a href="friends_list.html">Friends List</a></li>
