@@ -43,7 +43,7 @@ class NotificationRepository(BaseRepository):
             os.makedirs(directory, exist_ok=True)
 
         data = {str(notifications.id): {
-            'id' : notifications.id,
+            'id': notifications.id,
             'user_id': notifications.user_id,
             'message': notifications.message,
             'read': notifications.read,
@@ -54,10 +54,11 @@ class NotificationRepository(BaseRepository):
             json.dump(data, f, indent=4)
 
     def find_by_user_id(self, user_id):
-        for user in self._storage.values():
-            if user.user_id == user_id:
-                return user
-        return None
+        notifs = []
+        for notification in self._storage.values():
+            if notification.user_id == user_id:
+                notifs.append(notification)
+        return notifs
 
     def create(self, notification):
         notification.id = self._id_counter
@@ -67,12 +68,18 @@ class NotificationRepository(BaseRepository):
         return notification
 
     def mark_as_read(self, notification_id):
-        if notification_id not in self._storage:
+        if notification_id in self._storage:
             self._storage[notification_id].read = True
             self._save_to_file()
             return self._storage[notification_id]
         raise ValueError("Notification not found")
 
+    def delete(self, notification_id):
+        if notification_id in self._storage:
+            del self._storage[notification_id]
+            self._save_to_file()
+            return True
+        raise ValueError("Notification not found")
     def find_by_id(self, notification_id):
         pass
 
