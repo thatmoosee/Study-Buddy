@@ -4,7 +4,7 @@
         "user_id": 1,
         "name": "Max Quirk",
         "major": "Computer Science",
-        "availability": ["Tues Thurs 6-8pm"],
+        "availability": "",
         "preferences": [
             0,
             0,

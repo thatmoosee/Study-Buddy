@@ -180,5 +180,12 @@
         "message": "You created a Study Schedule for Group IT 327 Group from 2025-12-06T10:00 to 2025-12-06T11:00",
         "read": false,
         "created_at": null
+    },
+    "27": {
+        "id": 27,
+        "user_id": 2,
+        "message": "mvquirk@ilstu.edu just sent a message in DM_2_1!",
+        "read": false,
+        "created_at": null
     }
 }
