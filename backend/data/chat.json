@@ -40,5 +40,14 @@
             2,
             1
         ]
+    },
+    "33c14044b5164a0a9ed6995515caa91a": {
+        "name": "IT 326 Sectiom",
+        "chat_id": "33c14044b5164a0a9ed6995515caa91a",
+        "messages": [],
+        "members": [
+            1,
+            2
+        ]
     }
 }

@@ -72,12 +72,14 @@ class ChatService:
             raise ValueError("User not in chat.")
         raise ValueError("Chat not found.")
 
-    def send_message(self, user_id, chat_id, message):
+    def send_message(self, user_id, chat_id, message, user_email=None):
         chat = self.chat_repo.get(chat_id)
         if chat:
             if chat.messages is None:
                 chat.messages = []
-            new_message = f"{user_id}: {message}"
+            # Use email if provided, otherwise fallback to user_id
+            sender = user_email if user_email else user_id
+            new_message = f"{sender}: {message}"
             chat.messages.append(new_message)
             self.chat_repo.update(chat_id, chat)
             return chat
@@ -92,7 +94,7 @@ class ChatService:
 
     def get_chat(self, chat_id):
         chat = self.chat_repo.get(chat_id)
-
+        return chat
 
 
 

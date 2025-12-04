@@ -31,6 +31,8 @@ ul li a:hover{
 }
 main{
     margin: auto;
+    max-width: 800px;
+    padding: 20px;
 }
 main #profile{
     width: 35px;

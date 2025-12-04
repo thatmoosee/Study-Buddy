@@ -76,16 +76,45 @@
                 // Display friends
                 friendsContainer.innerHTML = "";
                 friends.forEach(friend => {
-                    const friendElement = document.createElement("p");
+                    const friendElement = document.createElement("div");
+                    friendElement.style.padding = "15px";
+                    friendElement.style.margin = "10px 0";
+                    friendElement.style.borderRadius = "5px";
+
+                    let profileHTML = "";
+                    if (friend.profile) {
+                        profileHTML = `
+                            <div style="margin-top: 10px; padding: 10px; background-color: #f9f9f9; border-radius: 3px; display: none;" class="profile-details">
+                                <strong>Profile:</strong><br>
+                                <span style="margin-left: 10px;">Name: ${friend.profile.name || 'Not set'}</span><br>
+                                <span style="margin-left: 10px;">Major: ${friend.profile.major || 'Not set'}</span><br>
+                                <span style="margin-left: 10px;">Availability: ${friend.profile.availability && friend.profile.availability.length > 0 ? friend.profile.availability.join(', ') : 'Not set'}</span>
+                            </div>
+                        `;
+                    } else {
+                        profileHTML = `
+                            <div style="margin-top: 10px; padding: 10px; background-color: #f9f9f9; border-radius: 3px; display: none;" class="profile-details">
+                                <strong>Profile:</strong> Not created yet
+                            </div>
+                        `;
+                    }
+
                     friendElement.innerHTML = `
-                        ${friend.email || friend.id}
-                        <button class="remove-friend-btn" data-friend-id="${friend.id}">Remove</button>
+                        <div>
+                            <strong>Email:</strong> ${friend.email || friend.id}
+                            <button class="remove-friend-btn" data-friend-id="${friend.id}" style="float: right;">Remove</button>
+                            <button class="view-profile-btn" style="margin-left: 10px;">View Profile</button>
+                        </div>
+                        ${profileHTML}
                     `;
                     friendsContainer.appendChild(friendElement);
                 });
 
                 // Attach remove button handlers
                 attachRemoveHandlers();
+
+                // Attach view profile button handlers
+                attachViewProfileHandlers();
             } else {
                 friendsContainer.innerHTML = "<p>Error loading friends.</p>";
             }
@@ -121,6 +150,25 @@
                     await loadFriendsList();
                 } else {
                     alert("Error: " + (data.error || data.message));
+                }
+            });
+        });
+    }
+
+    function attachViewProfileHandlers() {
+        const viewProfileButtons = document.querySelectorAll(".view-profile-btn");
+
+        viewProfileButtons.forEach(button => {
+            button.addEventListener("click", () => {
+                const profileDetails = button.closest("div").nextElementSibling;
+                if (profileDetails && profileDetails.classList.contains("profile-details")) {
+                    if (profileDetails.style.display === "none") {
+                        profileDetails.style.display = "block";
+                        button.textContent = "Hide Profile";
+                    } else {
+                        profileDetails.style.display = "none";
+                        button.textContent = "View Profile";
+                    }
                 }
             });
         });

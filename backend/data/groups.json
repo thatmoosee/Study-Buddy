@@ -38,5 +38,18 @@
             "Wed 8-10pm"
         ],
         "specified_class": "IT 386"
+    },
+    "33c14044b5164a0a9ed6995515caa91a": {
+        "id": "33c14044b5164a0a9ed6995515caa91a",
+        "name": "IT 326 Sectiom",
+        "owner_id": 1,
+        "members": [
+            1,
+            2
+        ],
+        "study_times": [
+            "5-7pm"
+        ],
+        "specified_class": "IT 326"
     }
 }

@@ -60,6 +60,18 @@ group_repo = GroupRepository(os.path.join(DATA_DIR, 'groups.json'))
 group_service = GroupService(group_repo)
 
 
+# HELPER FUNCTIONS
+
+def convert_ids_to_emails(user_ids):
+    """Convert a list of user IDs to emails"""
+    emails = []
+    for user_id in user_ids:
+        user = user_repo.find_by_id(user_id)
+        if user:
+            emails.append(user.email)
+        else:
+            emails.append(str(user_id))  # Fallback to ID if user not found
+    return emails
 
 # FRONTEND ROUTES
 
@@ -247,20 +259,22 @@ def create_group():
     members = data.get('members', [])
     study_times = data.get('study_times',[])
     specified_class = data.get('specified_class',[])
-    print(name)
     if not name:
         return jsonify({'success': False, 'error': 'Group name is required'}), 400
 
     try:
         owner_id = session['user_id']
         group = group_service.create_group(name, owner_id, members, study_times, specified_class)
-        print(group.to_dict())
         chat_service.create_chat(name, owner_id, members, group.to_dict().get('id', None))
-        print(group.to_dict())
+
+        # Convert member IDs to emails
+        group_dict = group.to_dict()
+        group_dict['members'] = convert_ids_to_emails(group_dict['members'])
+
         return jsonify({
             'success': True,
             'message': f'Group {group.name} created successfully!',
-            'data': group.to_dict()
+            'data': group_dict
         })
     except ValueError as e:
         return jsonify({'success': False, 'error': str(e)}), 400
@@ -292,6 +306,9 @@ def join_group():
                 notification_service.send_notification(member, f"You joined the group {group.to_dict()['name']}")
             else:
                 notification_service.send_notification(member, f"{user_id} joined the group {group.to_dict()['name']}")
+        # Convert member IDs to emails
+        group_dict = updated_group.to_dict()
+        group_dict['members'] = convert_ids_to_emails(group_dict['members'])
 
         return jsonify({
             'success': True,
@@ -363,7 +380,11 @@ def list_groups():
     # Get groups user belongs to using service method
     user_groups = group_service.get_user_groups(user_id)
     groups = [g.to_dict() for g in user_groups]
-
+    groups = []
+    for g in user_groups:
+        group_dict = g.to_dict()
+        group_dict['members'] = convert_ids_to_emails(group_dict['members'])
+        groups.append(group_dict)
     return jsonify({
         'success': True,
         'groups': groups
@@ -382,7 +403,11 @@ def upload_profile():
 @app.route('/api/group/listall', methods=['GET'])
 def list_all_groups():
     all_groups = group_service.list_all_groups()
-    group_list = [group.to_dict() for group in all_groups]
+    group_list = []
+    for group in all_groups:
+        group_dict = group.to_dict()
+        group_dict['members'] = convert_ids_to_emails(group_dict['members'])
+        group_list.append(group_dict)
     return jsonify({
         'success': True,
         'groups': group_list
@@ -513,6 +538,10 @@ def join_chat():
         else:
             notification_service.send_notification(member, f"{user_id} joined a Chat {group.to_dict()['name']}!")
     print(chat)
+    # Convert member IDs to emails
+    chat_dict = chat.to_dict()
+    chat_dict['members'] = convert_ids_to_emails(chat_dict['members'])
+
     return jsonify({
         'success': True,
         'message': f'Chat joined successfully!',
@@ -530,6 +559,11 @@ def create_chat():
         return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
     chat = chat_service.create_chat(name, owner_id, members)
     notification_service.send_notification(owner_id, f"You created a Chat {name}")
+
+    # Convert member IDs to emails
+    chat_dict = chat.to_dict()
+    chat_dict['members'] = convert_ids_to_emails(chat_dict['members'])
+
     return jsonify({
         'success': True,
         'message': f'Chat created successfully!',
@@ -545,18 +579,28 @@ def send_message():
     if not chat_id:
         return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
     print(chat_id, user_id, message)
-    chat = chat_service.send_message(user_id, chat_id, message)
+
+    # Get user email to use in message
+    user = user_repo.find_by_id(user_id)
+    user_email = user.email if user else str(user_id)
+
+    chat = chat_service.send_message(user_id, chat_id, message, user_email)
     group = chat_service.get_chat(chat_id)
     for member in chat.members:
         if user_id == member:
             pass
         else:
-            notification_service.send_notification(member, f"{user_id} just sent a Chat {group.to_dict()['name']}!")
+            notification_service.send_notification(member, f"{user_email} just sent a message in {group.to_dict()['name']}!")
     print(chat)
+
+    # Convert member IDs to emails
+    chat_dict = chat.to_dict()
+    chat_dict['members'] = convert_ids_to_emails(chat_dict['members'])
+
     return jsonify({
         'success': True,
         'message': f'Chat sent successfully!',
-        'study': chat.to_dict()
+        'study': chat_dict
     })
 
 @app.route('/api/chat/receive', methods=['POST'])
@@ -589,10 +633,14 @@ def leave_chat():
         else:
             notification_service.send_notification(member, f"{user_id} left a Chat {group.to_dict()['name']}!")
 
+    # Convert member IDs to emails
+    chat_dict = chat.to_dict()
+    chat_dict['members'] = convert_ids_to_emails(chat_dict['members'])
+
     return jsonify({
         'success': True,
         'message': f'Chat leaved successfully!',
-        'chats': chat.to_dict()
+        'chats': chat_dict
     })
 
 @app.route('/api/chat/listallchats', methods=['GET'])
@@ -602,7 +650,11 @@ def list_all_chats():
         return jsonify({'success': False, 'error': 'Not logged in'}), 401
 
     user_chats = chat_service.list_all_chats(user_id)
-    print(user_chats)
+
+    # Convert member IDs to emails in each chat
+    for chat_id, chat in user_chats.items():
+        chat['members'] = convert_ids_to_emails(chat['members'])
+
     return jsonify({
         'success': True,
         'message': f'Chat listed successfully!',
@@ -624,6 +676,12 @@ def filter_groups():
 
     for group in groups:
         print(group)
+    # Convert member IDs to emails
+    group_list = []
+    for group in groups:
+        group_dict = group.to_dict()
+        group_dict['members'] = convert_ids_to_emails(group_dict['members'])
+        group_list.append(group_dict)
 
     return jsonify({
         'success': True,
@@ -730,10 +788,15 @@ def accept_friend_request():
             try:
                 chat = chat_service.create_DM(user_id, requester_id)
                 notification_service.send_notification(requester_id, f"Your friend request was accepted!")
+
+                # Convert member IDs to emails
+                chat_dict = chat.to_dict()
+                chat_dict['members'] = convert_ids_to_emails(chat_dict['members'])
+
                 return jsonify({
                     'success': True,
                     'message': f'{message} A chat has been created!',
-                    'chat': chat.to_dict()
+                    'chat': chat_dict
                 })
             except Exception as e:
                 # Friend was accepted but chat creation failed
@@ -747,6 +810,7 @@ def accept_friend_request():
             return jsonify({'success': False, 'error': message}), 400
     except ValueError as e:
         return jsonify({'success': False, 'error': str(e)}), 400
+
 
 
 @app.route('/api/friend/reject', methods=['POST'])
@@ -809,15 +873,38 @@ def list_friends():
         user_id = session['user_id']
         friend_ids = friend_service.get_friends_list(user_id)
 
-        # Fetch user details for each friend
+        # Fetch user details, profile, and chats for each friend
         friends_list = []
         for friend_id in friend_ids:
             friend_user = user_repo.find_by_id(friend_id)
             if friend_user:
-                friends_list.append({
+                friend_data = {
                     'id': friend_user.id,
                     'email': friend_user.email
-                })
+                }
+
+                # Get friend's profile
+                friend_profile = profile_repo.find_by_user_id(friend_id)
+                if friend_profile:
+                    friend_data['profile'] = {
+                        'name': friend_profile.name,
+                        'major': friend_profile.major,
+                        'availability': friend_profile.availability
+                    }
+                else:
+                    friend_data['profile'] = None
+
+                # Get chats that the friend is in
+                friend_chats = []
+                all_chats = chat_service.list_all_chats(friend_id)
+                for chat_id, chat in all_chats.items():
+                    friend_chats.append({
+                        'chat_id': chat_id,
+                        'name': chat['name']
+                    })
+                friend_data['chats'] = friend_chats
+
+                friends_list.append(friend_data)
 
         return jsonify({
             'success': True,
