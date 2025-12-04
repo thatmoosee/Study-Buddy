@@ -83,12 +83,22 @@
 
                     let profileHTML = "";
                     if (friend.profile) {
+                        // Handle availability as either string or array
+                        let availabilityText = 'Not set';
+                        if (friend.profile.availability) {
+                            if (Array.isArray(friend.profile.availability)) {
+                                availabilityText = friend.profile.availability.length > 0 ? friend.profile.availability.join(', ') : 'Not set';
+                            } else if (typeof friend.profile.availability === 'string') {
+                                availabilityText = friend.profile.availability;
+                            }
+                        }
+
                         profileHTML = `
                             <div style="margin-top: 10px; padding: 10px; background-color: #f9f9f9; border-radius: 3px; display: none;" class="profile-details">
                                 <strong>Profile:</strong><br>
                                 <span style="margin-left: 10px;">Name: ${friend.profile.name || 'Not set'}</span><br>
                                 <span style="margin-left: 10px;">Major: ${friend.profile.major || 'Not set'}</span><br>
-                                <span style="margin-left: 10px;">Availability: ${friend.profile.availability && friend.profile.availability.length > 0 ? friend.profile.availability.join(', ') : 'Not set'}</span>
+                                <span style="margin-left: 10px;">Availability: ${availabilityText}</span>
                             </div>
                         `;
                     } else {

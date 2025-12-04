@@ -33,8 +33,7 @@ class UserRepository(BaseRepository):
                 self._storage[user.email] = user
                 if user.id >= self._id_counter:
                     self._id_counter = user.id + 1
-        except (FileNotFoundError, json.JSONDecodeError) as e:
-            print(f"No existing user data or error loading: {e}")
+        except (FileNotFoundError, json.JSONDecodeError):
             self._storage = {}
             self._id_counter = 1
 

@@ -2,25 +2,13 @@
     "1": {
         "id": 1,
         "email": "mvquirk@ilstu.edu",
-        "_password_hash": "$2b$12$qr715FzjbR1BzgQQjPnRVegJEcZjpwmnpclVpG/TM4uggZ3J9T7Qu",
+        "_password_hash": "$2b$12$dTAFs4TsrbWuGKiqD4N0FeLjAe6nEEkjOqzS9NE0WtjEdJgxeWkqu",
         "_is_active": true
     },
     "2": {
         "id": 2,
         "email": "jatopp@ilstu.edu",
-        "_password_hash": "$2b$12$baH6AdHNkwRBji56P567veadTQP6DG4sCP3IqGD8Hxk55B1YyCPgm",
-        "_is_active": true
-    },
-    "3": {
-        "id": 3,
-        "email": "test@university.edu",
-        "_password_hash": "$2b$12$TplUe.0eqkLkSZt59FRp9ebQ1bgzMvz1FlzSFRduuNuPxrl9nHHRS",
-        "_is_active": true
-    },
-    "4": {
-        "id": 4,
-        "email": "jatopp2@ilstu.edu",
-        "_password_hash": "$2b$12$DAOuNbGLCRTVNwvJxp2rJezbnGFcDCHkv8JqZOyewKwUyQZYl/k3u",
+        "_password_hash": "$2b$12$6b3Ie3PjRPQKPlXVtN6oi.foJS9A8BY/KvKCEvwFKhDpkWfv6tyvS",
         "_is_active": true
     }
 }

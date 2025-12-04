@@ -33,8 +33,7 @@ class ChatRepository(BaseRepository):
                     members=c['members']
                 )
                 self._storage[chat.chat_id] = chat
-        except (FileNotFoundError, json. JSONDecodeError) as e:
-            print(f"No exisiting chat data or error loading: {e}")
+        except (FileNotFoundError, json.JSONDecodeError):
             self._storage = {}
 
     def _save_to_file(self):

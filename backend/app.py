@@ -199,7 +199,6 @@ def forgot_password():
         return jsonify({'success': False, 'error': error_message}), 400
     except Exception as e:
         # Catch unexpected errors
-        print(f"Unexpected error in forgot_password: {str(e)}")
         return jsonify({'success': False, 'error': 'An unexpected error occurred'}), 500
 
 
@@ -235,7 +234,6 @@ def reset_password():
         return jsonify({'success': False, 'error': error_message}), 400
     except Exception as e:
         # Catch unexpected errors
-        print(f"Unexpected error in reset_password: {str(e)}")
         return jsonify({'success': False, 'error': 'An unexpected error occurred'}), 500
 
 
@@ -421,8 +419,6 @@ def get_notifications():
 
     user_id = session['user_id']
     notifications = notification_service.get_notifications(user_id)
-    for notification in notifications:
-        print(notification.to_dict())
     return jsonify({
         'success': True,
         'notifications': [notification.to_dict() for notification in notifications]
@@ -453,7 +449,6 @@ def delete_notifications():
 
     data = request.get_json() or {}
     notification_id = data.get('id')
-    print(data)
     if not notification_id:
         return jsonify({'success': False, 'error': 'Notification ID is required'}), 400
 
@@ -474,9 +469,7 @@ def create_study_schedule():
     title = data.get('session_name')
     start_time = data.get('start_date')
     end_time = data.get('end_date')
-    print(title, start_time, end_time)
     group_id = data.get('group_id') or None
-    print(group_id)
 
     if not title or not start_time or not end_time:
         return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
@@ -511,8 +504,6 @@ def get_study_schedule():
     try:
         schedules = study_scheduler_service.get_user_sessions(user_id)
         schedule = [sessions.to_dict() for sessions in schedules]
-        for sessions in schedules:
-            print(sessions.to_dict())
         return jsonify({
             'success': True,
             'message': f"Study schedule retrieved successfully!",
@@ -526,7 +517,6 @@ def join_chat():
     data = request.get_json() or {}
     chat_id = data.get('chat_id')
     user_id = session['user_id']
-    print(chat_id, user_id)
     if not chat_id or not user_id:
         return jsonify({'success': False, 'error': 'Invalid JSON format'}), 401
 
@@ -537,7 +527,6 @@ def join_chat():
             notification_service.send_notification(member, f"You joined a Chat {group.to_dict()['name']}!")
         else:
             notification_service.send_notification(member, f"{user_id} joined a Chat {group.to_dict()['name']}!")
-    print(chat)
     # Convert member IDs to emails
     chat_dict = chat.to_dict()
     chat_dict['members'] = convert_ids_to_emails(chat_dict['members'])
@@ -578,7 +567,6 @@ def send_message():
     user_id = session['user_id']
     if not chat_id:
         return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
-    print(chat_id, user_id, message)
 
     # Get user email to use in message
     user = user_repo.find_by_id(user_id)
@@ -591,7 +579,6 @@ def send_message():
             pass
         else:
             notification_service.send_notification(member, f"{user_email} just sent a message in {group.to_dict()['name']}!")
-    print(chat)
 
     # Convert member IDs to emails
     chat_dict = chat.to_dict()
@@ -666,7 +653,6 @@ def filter_groups():
     data = request.get_json()
     filter_type = data.get('type')
     value = data.get('value')
-    print(filter_type, value)
     if filter_type == "class":
         groups = group_service.filter_by_specified_class(value)
     elif filter_type == "study":
@@ -674,8 +660,6 @@ def filter_groups():
     else:
         return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
 
-    for group in groups:
-        print(group)
     # Convert member IDs to emails
     group_list = []
     for group in groups:
@@ -710,7 +694,7 @@ def remove_friend():
 
     try:
         user_id = session['user_id']
-        friend_id = data['friend_id']
+        friend_id = int(data['friend_id'])
         friend_service.remove_friend(user_id, friend_id)
         return jsonify({
             'success': True,
@@ -800,7 +784,6 @@ def accept_friend_request():
                 })
             except Exception as e:
                 # Friend was accepted but chat creation failed
-                print(f"Warning: Friend request accepted but chat creation failed: {str(e)}")
                 return jsonify({
                     'success': True,
                     'message': message,
@@ -876,35 +859,44 @@ def list_friends():
         # Fetch user details, profile, and chats for each friend
         friends_list = []
         for friend_id in friend_ids:
-            friend_user = user_repo.find_by_id(friend_id)
-            if friend_user:
-                friend_data = {
-                    'id': friend_user.id,
-                    'email': friend_user.email
-                }
-
-                # Get friend's profile
-                friend_profile = profile_repo.find_by_user_id(friend_id)
-                if friend_profile:
-                    friend_data['profile'] = {
-                        'name': friend_profile.name,
-                        'major': friend_profile.major,
-                        'availability': friend_profile.availability
+            try:
+                friend_user = user_repo.find_by_id(friend_id)
+                if friend_user:
+                    friend_data = {
+                        'id': friend_user.id,
+                        'email': friend_user.email
                     }
-                else:
-                    friend_data['profile'] = None
 
-                # Get chats that the friend is in
-                friend_chats = []
-                all_chats = chat_service.list_all_chats(friend_id)
-                for chat_id, chat in all_chats.items():
-                    friend_chats.append({
-                        'chat_id': chat_id,
-                        'name': chat['name']
-                    })
-                friend_data['chats'] = friend_chats
+                    # Get friend's profile
+                    try:
+                        friend_profile = profile_repo.find_by_user_id(friend_id)
+                        if friend_profile:
+                            friend_data['profile'] = {
+                                'name': friend_profile.name,
+                                'major': friend_profile.major,
+                                'availability': friend_profile.availability
+                            }
+                        else:
+                            friend_data['profile'] = None
+                    except Exception as e:
+                        friend_data['profile'] = None
 
-                friends_list.append(friend_data)
+                    # Get chats that the friend is in
+                    friend_chats = []
+                    try:
+                        all_chats = chat_service.list_all_chats(friend_id)
+                        for chat_id, chat in all_chats.items():
+                            friend_chats.append({
+                                'chat_id': chat_id,
+                                'name': chat['name']
+                            })
+                    except Exception:
+                        pass
+                    friend_data['chats'] = friend_chats
+
+                    friends_list.append(friend_data)
+            except Exception as e:
+                continue
 
         return jsonify({
             'success': True,

@@ -38,8 +38,7 @@ class PasswordResetTokenRepository(BaseRepository):
                 self._storage[token.token] = token
                 if token.id >= self._id_counter:
                     self._id_counter = token.id + 1
-        except (FileNotFoundError, json.JSONDecodeError) as e:
-            print(f"No existing token data or error loading: {e}")
+        except (FileNotFoundError, json.JSONDecodeError):
             self._storage = {}
             self._id_counter = 1
 

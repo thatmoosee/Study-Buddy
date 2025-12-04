@@ -1,13 +1,10 @@
 {
     "1": {
         "id": 1,
-        "user_id": 2,
-        "name": "Josh Topp",
+        "user_id": 1,
+        "name": "Max Quirk",
         "major": "Computer Science",
-        "availability": [
-            "Tues 8-10",
-            "Thurs 8-10"
-        ],
+        "availability": ["Tues Thurs 6-8pm"],
         "preferences": [
             0,
             0,

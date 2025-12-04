@@ -1,53 +1,24 @@
 {
-    "0754af5d6efe403e865fb0129f5e3a43": {
-        "name": "IT 327 Group",
-        "chat_id": "0754af5d6efe403e865fb0129f5e3a43",
-        "messages": [],
-        "members": []
-    },
-    "25501dfea6e9497082bb9df24cb479ef": {
-        "name": "IT 326 Group Section 001",
-        "chat_id": "25501dfea6e9497082bb9df24cb479ef",
-        "messages": [],
-        "members": [
-            2,
-            4
-        ]
-    },
-    "7e0c68b9c1cb491892e0bf8d1f606fb7": {
-        "name": "IT 383 Section 001",
-        "chat_id": "7e0c68b9c1cb491892e0bf8d1f606fb7",
-        "messages": [],
-        "members": [
-            2
-        ]
-    },
-    "4": {
-        "name": "DM_2_1",
-        "chat_id": "4",
-        "messages": [
-            "1: hey",
-            "2: hey",
-            "1: hi",
-            "1: hi",
-            "1: hi",
-            "1: hi",
-            "1: gh",
-            "1: 23",
-            "2: 45"
-        ],
-        "members": [
-            2,
-            1
-        ]
-    },
-    "33c14044b5164a0a9ed6995515caa91a": {
-        "name": "IT 326 Sectiom",
-        "chat_id": "33c14044b5164a0a9ed6995515caa91a",
+    "8c32d2bcfaba4efe97c9c833dfda52cb": {
+        "name": "IT 326 Section 001",
+        "chat_id": "8c32d2bcfaba4efe97c9c833dfda52cb",
         "messages": [],
         "members": [
             1,
             2
+        ]
+    },
+    "2": {
+        "name": "DM_2_1",
+        "chat_id": "2",
+        "messages": [
+            "jatopp@ilstu.edu: Hi!",
+            "jatopp@ilstu.edu: Hey",
+            "jatopp@ilstu.edu: Hey"
+        ],
+        "members": [
+            2,
+            1
         ]
     }
 }

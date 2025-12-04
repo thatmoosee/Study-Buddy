@@ -36,8 +36,7 @@ class StudySchedulerRepository(BaseRepository):
                 self._storage[scheduler.id] = scheduler
                 if scheduler.id >= self._id_counter:
                     self._id_counter = scheduler.id + 1
-        except (FileNotFoundError, json.JSONDecodeError) as e:
-            print(f"No existing schedule data or error loading: {e}")
+        except (FileNotFoundError, json.JSONDecodeError):
             self._storage = {}
             self._id_counter = 1
 

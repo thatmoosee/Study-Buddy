@@ -42,8 +42,6 @@ class ProfileEditor:
             raise ValueError(f"Cannot save profile: {', '.join(errors)}")
 
         ProfileEditor._storage[self._profile.user_id] = self._profile
-
-        print(f"Profile {self._profile.user_id} saved successfully.")
         return self._profile.to_dict()
 
     @property

@@ -48,8 +48,7 @@ class FriendRepository(BaseRepository):
                         created_at=created_at
                     )
                     self._storage[friend.id] = friend
-            except (json.JSONDecodeError, KeyError) as e:
-                print(f"Error loading friends: {e}")
+            except (json.JSONDecodeError, KeyError):
                 self._storage = {}
 
     # Save data from memory to persistent storage

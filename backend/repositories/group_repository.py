@@ -38,7 +38,6 @@ class GroupRepository(BaseRepository):
                     group.id = g['id']
                     self._storage[group.id] = group
             except (json.JSONDecodeError, KeyError) as e:
-                print(f"Error loading groups: {e}")
                 self._storage = {}
 
     def _save_data(self):

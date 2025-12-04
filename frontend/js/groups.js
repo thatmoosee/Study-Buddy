@@ -7,9 +7,11 @@ async function checkAuth() {
         return;
     }
     const id = data.user.user_id;
+    const email = data.user.email;
     document.body.setAttribute('user_id', id);
+    document.body.setAttribute('user_email', email);
     document.getElementById("userEmail").textContent =
-        "Logged in as: " + data.user.email;
+        "Logged in as: " + email;
 }
 
 async function loadFilteredGroups(filterType, filterValue){
@@ -257,8 +259,8 @@ async function openGroupInfo(group) {
     const joinButton = document.getElementById('joinGroupBtn');
     const leaveButton = document.getElementById('leaveGroupBtn');
     const scheduleSessionButton = document.getElementById('scheduleSession');
-    const user_id = +document.body.getAttribute('user_id');
-    const isMember = group.members.includes(user_id);
+    const user_email = document.body.getAttribute('user_email');
+    const isMember = group.members.includes(user_email);
     if(isMember){
         scheduleSessionButton.style.display="flex";
         joinButton.style.display = "none";
