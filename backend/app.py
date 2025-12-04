@@ -485,7 +485,7 @@ def create_study_schedule():
                                                            f"You created a Study Schedule for Group {group.to_dict()['name']} from {start_time} to {end_time}")
                 else:
                     notification_service.send_notification(member,
-                                                           f"{user_id} rceated a Study Schedule for Group {group.to_dict()['name']} from {schedule['start_date']} to {schedule['end_date']}")
+                                                           f"{user_id} rceated a Study Schedule for Group {group.to_dict()['name']} from {start_time} to {end_time}")
 
         return jsonify({
             'success': True,
@@ -509,6 +509,22 @@ def get_study_schedule():
             'message': f"Study schedule retrieved successfully!",
             'study': schedule
         })
+    except ValueError as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
+
+@app.route('/api/study_schedule/delete', methods=["POST"])
+def delete_study_schedule():
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'Not logged in'}), 401
+
+    data = request.get_json() or {}
+    session_id = data.get('id')
+    if not session_id:
+        return jsonify({'success': False, 'error': 'session id is required'}), 400
+
+    try:
+        study_scheduler_service.delete_session(session_id)
+        return jsonify({"success": True})
     except ValueError as e:
         return jsonify({'success': False, 'error': str(e)}), 400
 
@@ -653,9 +669,17 @@ def filter_groups():
     data = request.get_json()
     filter_type = data.get('type')
     value = data.get('value')
+    print(data)
+    print(filter_type, value)
+    if not filter_type or not value:
+        return jsonify({
+            "success": False,
+            "error": "Missing a field"
+        })
+
     if filter_type == "class":
         groups = group_service.filter_by_specified_class(value)
-    elif filter_type == "study":
+    elif filter_type == "time":
         groups = group_service.filter_by_study_times(value)
     else:
         return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
@@ -670,7 +694,7 @@ def filter_groups():
     return jsonify({
         'success': True,
         'message': f'Groups filtered successfully!',
-        "groups": [group.to_dict() for group in groups]
+        "groups": group_list
     })
 
 # FRIEND ROUTES

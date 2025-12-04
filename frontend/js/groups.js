@@ -14,6 +14,12 @@ async function checkAuth() {
         "Logged in as: " + email;
 }
 
+const resetBtn = document.getElementById('Reset');
+
+resetBtn.addEventListener("click", () => {
+    loadAllGroups();
+});
+
 async function loadFilteredGroups(filterType, filterValue){
     const res = await fetch("/api/group/filter", {
         method: "POST",
@@ -36,14 +42,14 @@ async function loadFilteredGroups(filterType, filterValue){
         return;
     }
 
-    groups.forEach(g=> {
+    groups.forEach(group=> {
         const li = document.createElement("li");
         li.className = "group-item";
-        li.textContent = `${g.name}`;
+        li.textContent = `${group.name}`;
 
         li.style.cursor = "pointer";
         li.addEventListener("click", () => {
-            openGroupInfo(g);
+            openGroupInfo(group);
         });
         list.appendChild(li);
     })
@@ -66,8 +72,30 @@ async function loadSessions(){
         const li = document.createElement("li");
         li.className = "group-item";
         li.textContent = `${session.title} ${session.start_time} - ${session.end_time}`;
+        const deleteSessionBtn = document.createElement('button');
+        deleteSessionBtn.textContent = 'Delete';
+        deleteSessionBtn.addEventListener('click', () => deleteSession(session.id, li));
+
+        li.append(deleteSessionBtn);
         list.appendChild(li)
     });
+}
+
+async function deleteSession(session_id, li){
+    try{
+        const res = await fetch('/api/study_schedule/delete', {
+            method: "POST",
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({id: session_id})
+        });
+
+        const data = await res.json();
+        if(!data.success) return;
+        li.remove();
+    }
+    catch(err){
+        console.error(err);
+    }
 }
 
 document.getElementById("scheduleSession").addEventListener("click", async () => {

@@ -12,10 +12,6 @@
 
     <main style="text-align:center;">
 
-        <a href="profile.html">
-            <img id="profile" src="img/profile.png">
-        </a>
-
         <h1>Profile</h1>
 
         <h3 id="userEmail">Loading user...</h3>
@@ -24,7 +20,6 @@
 
         <hr>
 
-        <!-- MY GROUPS -->
         <section>
             <h2>My Groups</h2>
             <ul id="groupList"></ul>
@@ -32,7 +27,17 @@
 
         <footer></footer>
     </main>
-
+    <div id="groupInfoPopup" class="popup">
+            <div class="popup-content">
+                <h3 id="groupTitle"></h3>
+                <p><strong>ID:</strong> <span id="groupId"></span></p>
+                <p><strong>Member(s):</strong> <span id="groupMembers"></span></p>
+                <p><strong>Class:</strong> <span id="specifiedClass"></span></p>
+                <p><strong>Time(s):</strong> <span id="studyTimes"></span></p>
+                <button id="scheduleSession" style="display: none;">Schedule study session</button>
+                <button id="groupInfoCloseBtn">Close</button>
+            </div>
+        </div>
     <script src="js/header.js"></script>
     <script src="js/profile.js"></script>
 </body>

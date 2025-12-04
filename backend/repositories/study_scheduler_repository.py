@@ -65,6 +65,13 @@ class StudySchedulerRepository(BaseRepository):
         return schedule
 
 
+    def delete(self, session_id):
+        if session_id in self._storage:
+            del self._storage[session_id]
+            self._save_to_file()
+            return True
+        raise ValueError("Session not found")
+
     def find_by_user_id(self, user_id):
         for schedule in self._storage.values():
             if schedule.user_id == user_id:

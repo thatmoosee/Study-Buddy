@@ -79,7 +79,7 @@ async function markAsRead(notificationID, isRead, liElement){
     }
 }
 
-async function deleteNotification(notificationID, liElement){
+async function deleteNotification(notificationID, li){
     try {
         const res = await fetch('/api/notifications/delete', {
             method: "POST",
@@ -89,7 +89,7 @@ async function deleteNotification(notificationID, liElement){
 
         const data = await res.json();
         if(!data.success) return;
-        liElement.remove();
+        li.remove();
 
     }
     catch(err){

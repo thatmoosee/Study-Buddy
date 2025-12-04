@@ -122,9 +122,7 @@ class GroupRepository(BaseRepository):
                 if specified_class not in group.specified_class:
                     continue
             if study_times is not None:
-                if study_times not in group.study_times:
-                    continue
-
-            groups.append(group)
+                if study_times in group.study_times:
+                    groups.append(group)
 
         return groups

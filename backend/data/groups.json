@@ -11,5 +11,18 @@
             "Tues Thurs 6-8pm"
         ],
         "specified_class": "IT 326"
+    },
+    "5f9d6cc86857443198b4c2ea2ac16a63": {
+        "id": "5f9d6cc86857443198b4c2ea2ac16a63",
+        "name": "IT 327 Group",
+        "owner_id": 2,
+        "members": [
+            2
+        ],
+        "study_times": [
+            "Tues 8-10pm",
+            "Thurs 8-10pm"
+        ],
+        "specified_class": "IT 327"
     }
 }

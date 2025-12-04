@@ -33,3 +33,6 @@ class SchedulerService:
     def get_user_sessions(self, user_id):
         return self.study_session_repository.get_sessions_by_user(user_id)
 
+    def delete_session(self, session_id):
+        return self.study_session_repository.delete(session_id)
+

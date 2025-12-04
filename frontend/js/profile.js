@@ -17,6 +17,7 @@ async function checkAuth() {
 /*
  * this pulls the users group the /api/group/list endpoint in app.py
 */
+
 async function loadGroups() {
     const res = await fetch("/api/group/list");
     if (!res.ok) return;
@@ -44,8 +45,32 @@ async function loadGroups() {
     });
 }
 
-function openGroupInfo(group) {
-    alert(`Group: ${group.name}\nID: ${group.id}\nMembers: ${group.members.join(", ")}\nClass: ${group.specified_class || "None"}\nTimes: ${group.study_times.join(", ") || "None"}`);
+document.getElementById('groupInfoCloseBtn').addEventListener('click', () => {
+    document.getElementById('groupInfoPopup').style.display = "none";
+});
+
+async function openGroupInfo(group) {
+    const popup = document.getElementById("groupInfoPopup");
+    document.getElementById("groupTitle").textContent = group.name;
+    document.getElementById("groupId").textContent = group.id;
+    document.getElementById("groupMembers").textContent = group.members.join(", ");
+    popup.setAttribute("group_id", group.id);
+    if(group.specified_class.length === 0){
+
+        document.getElementById("specifiedClass").textContent = "None";
+    }
+    else{
+        document.getElementById("specifiedClass").textContent = group.specified_class;
+
+    }
+    if(group.study_times.length === 0){
+        document.getElementById("studyTimes").textContent = "None";
+    }
+    else{
+        document.getElementById("studyTimes").textContent = group.study_times.join(",");
+    }
+
+    popup.style.display = "flex";
 }
 
 document.getElementById("logoutBtn").addEventListener("click", async () => {
