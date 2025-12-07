@@ -20,13 +20,6 @@
         "read": false,
         "created_at": null
     },
-    "4": {
-        "id": 4,
-        "user_id": 2,
-        "message": "You joined the group IT 326 Section 001",
-        "read": true,
-        "created_at": null
-    },
     "5": {
         "id": 5,
         "user_id": 2,
@@ -185,6 +178,41 @@
         "id": 27,
         "user_id": 2,
         "message": "mvquirk@ilstu.edu just sent a message in DM_2_1!",
+        "read": false,
+        "created_at": null
+    },
+    "28": {
+        "id": 28,
+        "user_id": 1,
+        "message": "2 rceated a Study Schedule for Group IT 326 Section 001 from 2025-10-25T22:00 to 2025-10-25T23:00",
+        "read": false,
+        "created_at": null
+    },
+    "29": {
+        "id": 29,
+        "user_id": 2,
+        "message": "You created a Study Schedule for Group IT 326 Section 001 from 2025-10-25T22:00 to 2025-10-25T23:00",
+        "read": false,
+        "created_at": null
+    },
+    "30": {
+        "id": 30,
+        "user_id": 2,
+        "message": "mvquirk@ilstu.edu just sent a message in IT 326 Section 001!",
+        "read": false,
+        "created_at": null
+    },
+    "31": {
+        "id": 31,
+        "user_id": 1,
+        "message": "jatopp@ilstu.edu just sent a message in IT 326 Section 001!",
+        "read": false,
+        "created_at": null
+    },
+    "32": {
+        "id": 32,
+        "user_id": 2,
+        "message": "You created a Chat Name",
         "read": false,
         "created_at": null
     }

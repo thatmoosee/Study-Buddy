@@ -2,7 +2,10 @@
     "8c32d2bcfaba4efe97c9c833dfda52cb": {
         "name": "IT 326 Section 001",
         "chat_id": "8c32d2bcfaba4efe97c9c833dfda52cb",
-        "messages": [],
+        "messages": [
+            "mvquirk@ilstu.edu: Hello",
+            "jatopp@ilstu.edu: wassup"
+        ],
         "members": [
             1,
             2
@@ -25,6 +28,14 @@
     "5f9d6cc86857443198b4c2ea2ac16a63": {
         "name": "IT 327 Group",
         "chat_id": "5f9d6cc86857443198b4c2ea2ac16a63",
+        "messages": [],
+        "members": [
+            2
+        ]
+    },
+    "4": {
+        "name": "Name",
+        "chat_id": "4",
         "messages": [],
         "members": [
             2

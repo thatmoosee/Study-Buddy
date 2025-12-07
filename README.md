@@ -407,7 +407,6 @@ tests/
 │   ├── test_chat_service.py       (16 tests)
 │   ├── test_notification_service.py (11 tests)
 │   └── test_scheduler_service.py  (13 tests)
-└── TEST_PLAN.md                   (IEEE test documentation)
 ```
 
 ### Running Tests
@@ -444,7 +443,7 @@ python -m unittest tests.test_services.test_auth_service.TestAuthService.test_re
 
 ### White-Box Testing
 
-A comprehensive white-box analysis is included in [TEST_PLAN.md](TEST_PLAN.md), featuring:
+A comprehensive white-box analysis is included in SRS DOCUMENT.md featuring:
 - **Control Flow Graph (CFG)** for `FriendService.send_friend_request()`
 - **Cyclomatic Complexity:** V(G) = 7
 - **Independent Paths:** All 7 paths tested
