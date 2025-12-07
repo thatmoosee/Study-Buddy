@@ -119,8 +119,8 @@ class GroupRepository(BaseRepository):
         groups = []
         for group in self._storage.values():
             if specified_class is not None:
-                if specified_class not in group.specified_class:
-                    continue
+                if specified_class in group.specified_class:
+                    groups.append(group)
             if study_times is not None:
                 if study_times in group.study_times:
                     groups.append(group)

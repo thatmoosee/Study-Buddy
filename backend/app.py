@@ -678,12 +678,12 @@ def filter_groups():
         })
 
     if filter_type == "class":
+        print(value)
         groups = group_service.filter_by_specified_class(value)
     elif filter_type == "time":
         groups = group_service.filter_by_study_times(value)
     else:
         return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
-
     # Convert member IDs to emails
     group_list = []
     for group in groups:
